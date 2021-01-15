@@ -1,0 +1,92 @@
+---
+title: "R Notebook"
+output: 
+  html_notebook:
+    code_folding: hide
+---
+
+```{r echo=FALSE}
+library(bigrquery)
+library(DBI)
+con <- dbConnect(
+  bigrquery::bigquery(),
+  project = "yassir-data-project",
+  dataset = "YassirGo",
+  billing = "yassir-data-project"
+)
+bq_auth(email = "abdelouaheb.hocine@yassir.com")
+knitr::opts_chunk$set(connection = "con", echo = FALSE)
+```
+
+
+### Interval between trips {.tabset}
+
+#### P90 2+ drivers appearences
+
+```{sql connection = "con", output.var = "df"}
+SELECT
+  DISTINCT rider,
+  p90_days_interval,
+  iqr_days_interval
+FROM (
+  SELECT
+    rider,
+    request_date,
+    LAG(request_date) OVER(PARTITION BY rider ORDER BY request_date) AS lag_request_date,
+    DATE_DIFF(request_date, LAG(request_date) OVER(PARTITION BY rider ORDER BY request_date), day) AS days_between_trips,
+    ROUND(percentile_cont(days_between_trips,
+        0.9) OVER(PARTITION BY rider)) AS p90_days_interval,
+    ROUND(percentile_cont(days_between_trips,
+        0.75) OVER(PARTITION BY rider) - percentile_cont(days_between_trips,
+        0.25) OVER(PARTITION BY rider)) AS iqr_days_interval
+  FROM (
+    SELECT
+      rider,
+      request_date,
+      LAG(request_date) OVER(PARTITION BY rider ORDER BY request_date) AS lag_request_date,
+      DATE_DIFF(request_date, LAG(request_date) OVER(PARTITION BY rider ORDER BY request_date), day) AS days_between_trips
+    FROM (
+      SELECT
+        DISTINCT DATE(requested_at.date, 'Africa/Algiers') AS request_date,
+        rider,
+      FROM
+        `yassir-data-project.YassirGo.trips_production`
+      WHERE
+        status = 'FINISHED'
+        AND pickup_details.lvl0_label IN ('Algérie',
+          'Alg��rie')
+        AND rider IN (
+        SELECT
+          DISTINCT rider
+        FROM
+          `yassir-data-project.YassirGo.trips_production`
+        WHERE
+          status = 'FINISHED'
+          AND pickup_details.lvl0_label IN ('Algérie',
+            'Alg��rie')
+        GROUP BY
+          rider
+        HAVING
+          COUNT(DISTINCT DATE(requested_at.date, 'Africa/Algiers')) >= 2 ) ) ) )
+```
+
+
+```{r message=FALSE}
+library(tidyverse)
+df2 <-df%>% 
+  group_by(p90_days_interval) %>% 
+  summarise(riders = n_distinct(rider)) %>% 
+  mutate(cumulative_riders = round(cumsum(riders)/sum(riders), 2))
+df2
+
+df %>% 
+  group_by(p90_days_interval) %>% 
+  summarise(riders = n_distinct(rider)) %>% 
+  mutate(cumulative_riders = round(cumsum(riders)/sum(riders), 2)) %>% 
+  ggplot(aes(p90_days_interval, cumulative_riders)) +
+  geom_line(size = 0.7, color = 'orange') +
+  scale_y_continuous(breaks = c(.8, .9, .95, .99), labels = scales::percent_format(), minor_breaks = NULL) +
+  scale_x_continuous(breaks = c(0, 14, 28, 60, 90, 120), minor_breaks = NULL) +
+  labs(title = 'P90 of intervals distribution', subtitle = '2+ distinct appearences', x = 'P90 intervals [days]', y = 'Cumulative Drivers [%]') +
+  theme_minimal()
+```

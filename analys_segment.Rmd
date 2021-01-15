@@ -49,7 +49,6 @@ library(klaR)
 library(scales)
 library(cluster)
 library(factoextra)
-library(DataExplorer)
 library(ClustOfVar)
 library(GGally)
 library(lubridate)
@@ -92,11 +91,15 @@ skim(df)
                                                                                              rowSums(is.na(dat))                                                                                                                                                                                                                                 
 f_month_tets
 glimpse(df)
+```
+
+
+```{r}
 ### Data preparation
 
 ## estimated Cost:
 
-df_month <- df %>% filter(pickup_WL_most_use == "Alger") %>% mutate(month_year= paste(Year_Trip,Month_Trip,sep = '_'),segment_date=strftime(Creation_Date,format="%Y-%m")) %>% filter (!is.na(Creation_Date))%>% dplyr::distinct(rider,segment_date,Year_Trip,Month_Trip,month_year,nb_trips,original_cost,estimated_cost,nb_day_use) %>% arrange(rider,Year_Trip,Month_Trip,month_year) %>%  dplyr::distinct(rider,segment_date,month_year,estimated_cost) %>% spread(month_year,estimated_cost)%>% mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .))) %>% mutate(`2017_6_n`=`2017_6`*1,
+df_month <- df %>% filter(pickup_WL_most_use == "Alger") %>% mutate(month_year= paste(Year_Trip,Month_Trip,sep = '_'),segment_date=strftime(Creation_Date,format="%Y-%m")) %>% filter (!is.na(Creation_Date))%>% dplyr::distinct(rider,Creation_Date,segment_date,Year_Trip,Month_Trip,month_year,nb_trips,original_cost,estimated_cost,nb_day_use,Creation_Date,first_trip_date) %>% arrange(rider,Year_Trip,Month_Trip,month_year) %>%  dplyr::distinct(rider,segment_date,month_year,estimated_cost,Creation_Date,first_trip_date) %>% spread(month_year,estimated_cost)%>% mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .))) %>% mutate(`2017_6_n`=`2017_6`*1,
 `2017_7_n`=`2017_7`*31/30,
 `2017_8_n`=`2017_8`*31/30,
 `2017_9_n`=`2017_9`*1,
@@ -193,49 +196,49 @@ df_month$seg_41 <- rowSums(subset(df_month,select =c(`2020_10_n`,`2020_11_n`,`20
 
 ##
 df_month_t$seg_m_1 <- rowSums(subset(df_month_t,select =c(`2017_6`,`2017_7`,`2017_8`)), na.rm = TRUE) 
-df_month_t$seg_m_2 <- rowMeans(subset(df_month_t,select =c(`2017_7`,`2017_8`,`2017_9`)), na.rm = TRUE)
-df_month_t$seg_m_3 <- rowMeans(subset(df_month_t,select =c(`2017_8`,`2017_9`,`2017_10`)), na.rm = TRUE)
-df_month_t$seg_m_4 <- rowMeans(subset(df_month_t,select =c(`2017_9`,`2017_10`,`2017_11`)), na.rm = TRUE)
-df_month_t$seg_m_5 <- rowMeans(subset(df_month_t,select =c(`2017_10`,`2017_11`,`2017_12`)), na.rm = TRUE)
-df_month_t$seg_m_6 <- rowMeans(subset(df_month_t,select =c(`2017_11`,`2017_12`,`2018_1`)), na.rm = TRUE)
-df_month_t$seg_m_7 <- rowMeans(subset(df_month_t,select =c(`2017_12`,`2018_1`,`2018_2`)), na.rm = TRUE)
-df_month_t$seg_m_8 <- rowMeans(subset(df_month_t,select =c(`2018_1`,`2018_2`,`2018_3`)), na.rm = TRUE)
-df_month_t$seg_m_9 <- rowMeans(subset(df_month_t,select =c(`2018_2`,`2018_3`,`2018_4`)), na.rm = TRUE)
-df_month_t$seg_m_10 <- rowMeans(subset(df_month_t,select =c(`2018_3`,`2018_4`,`2018_5`)), na.rm = TRUE)
-df_month_t$seg_m_11 <- rowMeans(subset(df_month_t,select =c(`2018_4`,`2018_5`,`2018_6`)), na.rm = TRUE)
-df_month_t$seg_m_12 <- rowMeans(subset(df_month_t,select =c(`2018_5`,`2018_6`,`2018_7`)), na.rm = TRUE)
-df_month_t$seg_m_13 <- rowMeans(subset(df_month_t,select =c(`2018_6`,`2018_7`,`2018_8`)), na.rm = TRUE)
-df_month_t$seg_m_14 <- rowMeans(subset(df_month_t,select =c(`2018_7`,`2018_8`,`2018_9`)), na.rm = TRUE)
-df_month_t$seg_m_15 <- rowMeans(subset(df_month_t,select =c(`2018_8`,`2018_9`,`2018_10`)), na.rm = TRUE)
-df_month_t$seg_m_16 <- rowMeans(subset(df_month_t,select =c(`2018_9`,`2018_10`,`2018_11`)), na.rm = TRUE)
-df_month_t$seg_m_17 <- rowMeans(subset(df_month_t,select =c(`2018_10`,`2018_11`,`2018_12`)), na.rm = TRUE)
-df_month_t$seg_m_18 <- rowMeans(subset(df_month_t,select =c(`2018_11`,`2018_12`,`2019_1`)), na.rm = TRUE)
-df_month_t$seg_m_19 <- rowMeans(subset(df_month_t,select =c(`2018_12`,`2019_1`,`2019_2`)), na.rm = TRUE)
-df_month_t$seg_m_20 <- rowMeans(subset(df_month_t,select =c(`2019_1`,`2019_2`,`2019_3`)), na.rm = TRUE)
-df_month_t$seg_m_21 <- rowMeans(subset(df_month_t,select =c(`2019_2`,`2019_3`,`2019_4`)), na.rm = TRUE)
-df_month_t$seg_m_22 <- rowMeans(subset(df_month_t,select =c(`2019_3`,`2019_4`,`2019_5`)), na.rm = TRUE)
-df_month_t$seg_m_23 <- rowMeans(subset(df_month_t,select =c(`2019_4`,`2019_5`,`2019_6`)), na.rm = TRUE)
-df_month_t$seg_m_24 <- rowMeans(subset(df_month_t,select =c(`2019_5`,`2019_6`,`2019_7`)), na.rm = TRUE)
-df_month_t$seg_m_25 <- rowMeans(subset(df_month_t,select =c(`2019_6`,`2019_7`,`2019_8`)), na.rm = TRUE)
-df_month_t$seg_m_26 <- rowMeans(subset(df_month_t,select =c(`2019_7`,`2019_8`,`2019_9`)), na.rm = TRUE)
-df_month_t$seg_m_27 <- rowMeans(subset(df_month_t,select =c(`2019_8`,`2019_9`,`2019_10`)), na.rm = TRUE)
-df_month_t$seg_m_28 <- rowMeans(subset(df_month_t,select =c(`2019_9`,`2019_10`,`2019_11`)), na.rm = TRUE)
-df_month_t$seg_m_29 <- rowMeans(subset(df_month_t,select =c(`2019_10`,`2019_11`,`2019_12`)), na.rm = TRUE)
-df_month_t$seg_m_30 <- rowMeans(subset(df_month_t,select =c(`2019_11`,`2019_12`,`2020_1`)), na.rm = TRUE)
-df_month_t$seg_m_31 <- rowMeans(subset(df_month_t,select =c(`2019_12`,`2020_1`,`2020_2`)), na.rm = TRUE)
-df_month_t$seg_m_32 <- rowMeans(subset(df_month_t,select =c(`2020_1`,`2020_2`,`2020_3`)), na.rm = TRUE)
-df_month_t$seg_m_33 <- rowMeans(subset(df_month_t,select =c(`2020_2`,`2020_3`,`2020_4`)), na.rm = TRUE)
-df_month_t$seg_m_34 <- rowMeans(subset(df_month_t,select =c(`2020_3`,`2020_4`,`2020_5`)), na.rm = TRUE)
-df_month_t$seg_m_35 <- rowMeans(subset(df_month_t,select =c(`2020_4`,`2020_5`,`2020_6`)), na.rm = TRUE)
-df_month_t$seg_m_36 <- rowMeans(subset(df_month_t,select =c(`2020_5`,`2020_6`,`2020_7`)), na.rm = TRUE)
-df_month_t$seg_m_37 <- rowMeans(subset(df_month_t,select =c(`2020_6`,`2020_7`,`2020_8`)), na.rm = TRUE)
-df_month_t$seg_m_38 <- rowMeans(subset(df_month_t,select =c(`2020_7`,`2020_8`,`2020_9`)), na.rm = TRUE)
-df_month_t$seg_m_39 <- rowMeans(subset(df_month_t,select =c(`2020_8`,`2020_9`,`2020_10`)), na.rm = TRUE)
-df_month_t$seg_m_40 <- rowMeans(subset(df_month_t,select =c(`2020_9`,`2020_10`,`2020_11`)), na.rm = TRUE)
-df_month_t$seg_m_41 <- rowMeans(subset(df_month_t,select =c(`2020_10`,`2020_11`,`2020_12`)), na.rm = TRUE)
+df_month_t$seg_m_2 <- rowSums(subset(df_month_t,select =c(`2017_7`,`2017_8`,`2017_9`)), na.rm = TRUE)
+df_month_t$seg_m_3 <- rowSums(subset(df_month_t,select =c(`2017_8`,`2017_9`,`2017_10`)), na.rm = TRUE)
+df_month_t$seg_m_4 <- rowSums(subset(df_month_t,select =c(`2017_9`,`2017_10`,`2017_11`)), na.rm = TRUE)
+df_month_t$seg_m_5 <- rowSums(subset(df_month_t,select =c(`2017_10`,`2017_11`,`2017_12`)), na.rm = TRUE)
+df_month_t$seg_m_6 <- rowSums(subset(df_month_t,select =c(`2017_11`,`2017_12`,`2018_1`)), na.rm = TRUE)
+df_month_t$seg_m_7 <- rowSums(subset(df_month_t,select =c(`2017_12`,`2018_1`,`2018_2`)), na.rm = TRUE)
+df_month_t$seg_m_8 <- rowSums(subset(df_month_t,select =c(`2018_1`,`2018_2`,`2018_3`)), na.rm = TRUE)
+df_month_t$seg_m_9 <- rowSums(subset(df_month_t,select =c(`2018_2`,`2018_3`,`2018_4`)), na.rm = TRUE)
+df_month_t$seg_m_10 <- rowSums(subset(df_month_t,select =c(`2018_3`,`2018_4`,`2018_5`)), na.rm = TRUE)
+df_month_t$seg_m_11 <- rowSums(subset(df_month_t,select =c(`2018_4`,`2018_5`,`2018_6`)), na.rm = TRUE)
+df_month_t$seg_m_12 <- rowSums(subset(df_month_t,select =c(`2018_5`,`2018_6`,`2018_7`)), na.rm = TRUE)
+df_month_t$seg_m_13 <- rowSums(subset(df_month_t,select =c(`2018_6`,`2018_7`,`2018_8`)), na.rm = TRUE)
+df_month_t$seg_m_14 <- rowSums(subset(df_month_t,select =c(`2018_7`,`2018_8`,`2018_9`)), na.rm = TRUE)
+df_month_t$seg_m_15 <- rowSums(subset(df_month_t,select =c(`2018_8`,`2018_9`,`2018_10`)), na.rm = TRUE)
+df_month_t$seg_m_16 <- rowSums(subset(df_month_t,select =c(`2018_9`,`2018_10`,`2018_11`)), na.rm = TRUE)
+df_month_t$seg_m_17 <- rowSums(subset(df_month_t,select =c(`2018_10`,`2018_11`,`2018_12`)), na.rm = TRUE)
+df_month_t$seg_m_18 <- rowSums(subset(df_month_t,select =c(`2018_11`,`2018_12`,`2019_1`)), na.rm = TRUE)
+df_month_t$seg_m_19 <- rowSums(subset(df_month_t,select =c(`2018_12`,`2019_1`,`2019_2`)), na.rm = TRUE)
+df_month_t$seg_m_20 <- rowSums(subset(df_month_t,select =c(`2019_1`,`2019_2`,`2019_3`)), na.rm = TRUE)
+df_month_t$seg_m_21 <- rowSums(subset(df_month_t,select =c(`2019_2`,`2019_3`,`2019_4`)), na.rm = TRUE)
+df_month_t$seg_m_22 <- rowSums(subset(df_month_t,select =c(`2019_3`,`2019_4`,`2019_5`)), na.rm = TRUE)
+df_month_t$seg_m_23 <- rowSums(subset(df_month_t,select =c(`2019_4`,`2019_5`,`2019_6`)), na.rm = TRUE)
+df_month_t$seg_m_24 <- rowSums(subset(df_month_t,select =c(`2019_5`,`2019_6`,`2019_7`)), na.rm = TRUE)
+df_month_t$seg_m_25 <- rowSums(subset(df_month_t,select =c(`2019_6`,`2019_7`,`2019_8`)), na.rm = TRUE)
+df_month_t$seg_m_26 <- rowSums(subset(df_month_t,select =c(`2019_7`,`2019_8`,`2019_9`)), na.rm = TRUE)
+df_month_t$seg_m_27 <- rowSums(subset(df_month_t,select =c(`2019_8`,`2019_9`,`2019_10`)), na.rm = TRUE)
+df_month_t$seg_m_28 <- rowSums(subset(df_month_t,select =c(`2019_9`,`2019_10`,`2019_11`)), na.rm = TRUE)
+df_month_t$seg_m_29 <- rowSums(subset(df_month_t,select =c(`2019_10`,`2019_11`,`2019_12`)), na.rm = TRUE)
+df_month_t$seg_m_30 <- rowSums(subset(df_month_t,select =c(`2019_11`,`2019_12`,`2020_1`)), na.rm = TRUE)
+df_month_t$seg_m_31 <- rowSums(subset(df_month_t,select =c(`2019_12`,`2020_1`,`2020_2`)), na.rm = TRUE)
+df_month_t$seg_m_32 <- rowSums(subset(df_month_t,select =c(`2020_1`,`2020_2`,`2020_3`)), na.rm = TRUE)
+df_month_t$seg_m_33 <- rowSums(subset(df_month_t,select =c(`2020_2`,`2020_3`,`2020_4`)), na.rm = TRUE)
+df_month_t$seg_m_34 <- rowSums(subset(df_month_t,select =c(`2020_3`,`2020_4`,`2020_5`)), na.rm = TRUE)
+df_month_t$seg_m_35 <- rowSums(subset(df_month_t,select =c(`2020_4`,`2020_5`,`2020_6`)), na.rm = TRUE)
+df_month_t$seg_m_36 <- rowSums(subset(df_month_t,select =c(`2020_5`,`2020_6`,`2020_7`)), na.rm = TRUE)
+df_month_t$seg_m_37 <- rowSums(subset(df_month_t,select =c(`2020_6`,`2020_7`,`2020_8`)), na.rm = TRUE)
+df_month_t$seg_m_38 <- rowSums(subset(df_month_t,select =c(`2020_7`,`2020_8`,`2020_9`)), na.rm = TRUE)
+df_month_t$seg_m_39 <- rowSums(subset(df_month_t,select =c(`2020_8`,`2020_9`,`2020_10`)), na.rm = TRUE)
+df_month_t$seg_m_40 <- rowSums(subset(df_month_t,select =c(`2020_9`,`2020_10`,`2020_11`)), na.rm = TRUE)
+df_month_t$seg_m_41 <- rowSums(subset(df_month_t,select =c(`2020_10`,`2020_11`,`2020_12`)), na.rm = TRUE)
 
 
-df_month_3 <- df_month %>% left_join(df_month_t, by="rider") %>% dplyr::select(rider,segment_date,starts_with("seg")) %>% mutate(n_seg_1  =  seg_1/seg_m_1,
+df_month_3 <- df_month %>% left_join(df_month_t, by="rider") %>% dplyr::select(rider,first_trip_date,Creation_Date,segment_date,starts_with("seg")) %>% mutate(n_seg_1  =  seg_1/seg_m_1,
 n_seg_2  =  seg_2/seg_m_2,
 n_seg_3  =  seg_3/seg_m_3,
 n_seg_4  =  seg_4/seg_m_4,
@@ -317,11 +320,11 @@ e_seg_38=seg_38,
 e_seg_39=seg_39,
 e_seg_40=seg_40,
 e_seg_41=seg_41
-) %>% dplyr::select(rider,segment_date,starts_with("n"),starts_with("e"))%>% mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .))) 
+) %>% dplyr::select(rider,Creation_Date,first_trip_date,segment_date,starts_with("n"),starts_with("e"))%>% mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .))) 
 
 is.num <- sapply(df_month_3, is.numeric)
 df_month_3[is.num] <- lapply(df_month_3[is.num], round, 0)
-
+df_month_3
 
 ###
 
@@ -372,48 +375,47 @@ df_month_or <- df %>% filter(pickup_WL_most_use == "Alger") %>% mutate(month_yea
 
 ####  Normalized original cost
 
-df_month_or$seg_1 <- rowSums(subset(df_month,select =c(`2017_6_n`,`2017_7_n`,`2017_8_n`)), na.rm = TRUE) 
-
-df_month_or$seg_2 <- rowSums(subset(df_month,select =c(`2017_7_n`,`2017_8_n`,`2017_9_n`)), na.rm = TRUE)
-df_month_or$seg_3 <- rowSums(subset(df_month,select =c(`2017_8_n`,`2017_9_n`,`2017_10_n`)), na.rm = TRUE)
-df_month_or$seg_4 <- rowSums(subset(df_month,select =c(`2017_9_n`,`2017_10_n`,`2017_11_n`)), na.rm = TRUE)
-df_month_or$seg_5 <- rowSums(subset(df_month,select =c(`2017_10_n`,`2017_11_n`,`2017_12_n`)), na.rm = TRUE)
-df_month_or$seg_6 <- rowSums(subset(df_month,select =c(`2017_11_n`,`2017_12_n`,`2018_1_n`)), na.rm = TRUE)
-df_month_or$seg_7 <- rowSums(subset(df_month,select =c(`2017_12_n`,`2018_1_n`,`2018_2_n`)), na.rm = TRUE)
-df_month_or$seg_8 <- rowSums(subset(df_month,select =c(`2018_1_n`,`2018_2_n`,`2018_3_n`)), na.rm = TRUE)
-df_month_or$seg_9 <- rowSums(subset(df_month,select =c(`2018_2_n`,`2018_3_n`,`2018_4_n`)), na.rm = TRUE)
-df_month_or$seg_10 <- rowSums(subset(df_month,select =c(`2018_3_n`,`2018_4_n`,`2018_5_n`)), na.rm = TRUE)
-df_month_or$seg_11 <- rowSums(subset(df_month,select =c(`2018_4_n`,`2018_5_n`,`2018_6_n`)), na.rm = TRUE)
-df_month_or$seg_12 <- rowSums(subset(df_month,select =c(`2018_5_n`,`2018_6_n`,`2018_7_n`)), na.rm = TRUE)
-df_month_or$seg_13 <- rowSums(subset(df_month,select =c(`2018_6_n`,`2018_7_n`,`2018_8_n`)), na.rm = TRUE)
-df_month_or$seg_14 <- rowSums(subset(df_month,select =c(`2018_7_n`,`2018_8_n`,`2018_9_n`)), na.rm = TRUE)
-df_month_or$seg_15 <- rowSums(subset(df_month,select =c(`2018_8_n`,`2018_9_n`,`2018_10_n`)), na.rm = TRUE)
-df_month_or$seg_16 <- rowSums(subset(df_month,select =c(`2018_9_n`,`2018_10_n`,`2018_11_n`)), na.rm = TRUE)
-df_month_or$seg_17 <- rowSums(subset(df_month,select =c(`2018_10_n`,`2018_11_n`,`2018_12_n`)), na.rm = TRUE)
-df_month_or$seg_18 <- rowSums(subset(df_month,select =c(`2018_11_n`,`2018_12_n`,`2019_1_n`)), na.rm = TRUE)
-df_month_or$seg_19 <- rowSums(subset(df_month,select =c(`2018_12_n`,`2019_1_n`,`2019_2_n`)), na.rm = TRUE)
-df_month_or$seg_20 <- rowSums(subset(df_month,select =c(`2019_1_n`,`2019_2_n`,`2019_3_n`)), na.rm = TRUE)
-df_month_or$seg_21 <- rowSums(subset(df_month,select =c(`2019_2_n`,`2019_3_n`,`2019_4_n`)), na.rm = TRUE)
-df_month_or$seg_22 <- rowSums(subset(df_month,select =c(`2019_3_n`,`2019_4_n`,`2019_5_n`)), na.rm = TRUE)
-df_month_or$seg_23 <- rowSums(subset(df_month,select =c(`2019_4_n`,`2019_5_n`,`2019_6_n`)), na.rm = TRUE)
-df_month_or$seg_24 <- rowSums(subset(df_month,select =c(`2019_5_n`,`2019_6_n`,`2019_7_n`)), na.rm = TRUE)
-df_month_or$seg_25 <- rowSums(subset(df_month,select =c(`2019_6_n`,`2019_7_n`,`2019_8_n`)), na.rm = TRUE)
-df_month_or$seg_26 <- rowSums(subset(df_month,select =c(`2019_7_n`,`2019_8_n`,`2019_9_n`)), na.rm = TRUE)
-df_month_or$seg_27 <- rowSums(subset(df_month,select =c(`2019_8_n`,`2019_9_n`,`2019_10_n`)), na.rm = TRUE)
-df_month_or$seg_28 <- rowSums(subset(df_month,select =c(`2019_9_n`,`2019_10_n`,`2019_11_n`)), na.rm = TRUE)
-df_month_or$seg_29 <- rowSums(subset(df_month,select =c(`2019_10_n`,`2019_11_n`,`2019_12_n`)), na.rm = TRUE)
-df_month_or$seg_30 <- rowSums(subset(df_month,select =c(`2019_11_n`,`2019_12_n`,`2020_1_n`)), na.rm = TRUE)
-df_month_or$seg_31 <- rowSums(subset(df_month,select =c(`2019_12_n`,`2020_1_n`,`2020_2_n`)), na.rm = TRUE)
-df_month_or$seg_32 <- rowSums(subset(df_month,select =c(`2020_1_n`,`2020_2_n`,`2020_3_n`)), na.rm = TRUE)
-df_month_or$seg_33 <- rowSums(subset(df_month,select =c(`2020_2_n`,`2020_3_n`,`2020_4_n`)), na.rm = TRUE)
-df_month_or$seg_34 <- rowSums(subset(df_month,select =c(`2020_3_n`,`2020_4_n`,`2020_5_n`)), na.rm = TRUE)
-df_month_or$seg_35 <- rowSums(subset(df_month,select =c(`2020_4_n`,`2020_5_n`,`2020_6_n`)), na.rm = TRUE)
-df_month_or$seg_36 <- rowSums(subset(df_month,select =c(`2020_5_n`,`2020_6_n`,`2020_7_n`)), na.rm = TRUE)
-df_month_or$seg_37 <- rowSums(subset(df_month,select =c(`2020_6_n`,`2020_7_n`,`2020_8_n`)), na.rm = TRUE)
-df_month_or$seg_38 <- rowSums(subset(df_month,select =c(`2020_7_n`,`2020_8_n`,`2020_9_n`)), na.rm = TRUE)
-df_month_or$seg_39 <- rowSums(subset(df_month,select =c(`2020_8_n`,`2020_9_n`,`2020_10_n`)), na.rm = TRUE)
-df_month_or$seg_40 <- rowSums(subset(df_month,select =c(`2020_9_n`,`2020_10_n`,`2020_11_n`)), na.rm = TRUE)
-df_month_or$seg_41 <- rowSums(subset(df_month,select =c(`2020_10_n`,`2020_11_n`,`2020_12_n`)), na.rm = TRUE)
+df_month_or$seg_1 <- rowSums(subset(df_month_or,select =c(`2017_6_n`,`2017_7_n`,`2017_8_n`)), na.rm = TRUE) 
+df_month_or$seg_2 <- rowSums(subset(df_month_or,select =c(`2017_7_n`,`2017_8_n`,`2017_9_n`)), na.rm = TRUE)
+df_month_or$seg_3 <- rowSums(subset(df_month_or,select =c(`2017_8_n`,`2017_9_n`,`2017_10_n`)), na.rm = TRUE)
+df_month_or$seg_4 <- rowSums(subset(df_month_or,select =c(`2017_9_n`,`2017_10_n`,`2017_11_n`)), na.rm = TRUE)
+df_month_or$seg_5 <- rowSums(subset(df_month_or,select =c(`2017_10_n`,`2017_11_n`,`2017_12_n`)), na.rm = TRUE)
+df_month_or$seg_6 <- rowSums(subset(df_month_or,select =c(`2017_11_n`,`2017_12_n`,`2018_1_n`)), na.rm = TRUE)
+df_month_or$seg_7 <- rowSums(subset(df_month_or,select =c(`2017_12_n`,`2018_1_n`,`2018_2_n`)), na.rm = TRUE)
+df_month_or$seg_8 <- rowSums(subset(df_month_or,select =c(`2018_1_n`,`2018_2_n`,`2018_3_n`)), na.rm = TRUE)
+df_month_or$seg_9 <- rowSums(subset(df_month_or,select =c(`2018_2_n`,`2018_3_n`,`2018_4_n`)), na.rm = TRUE)
+df_month_or$seg_10 <- rowSums(subset(df_month_or,select =c(`2018_3_n`,`2018_4_n`,`2018_5_n`)), na.rm = TRUE)
+df_month_or$seg_11 <- rowSums(subset(df_month_or,select =c(`2018_4_n`,`2018_5_n`,`2018_6_n`)), na.rm = TRUE)
+df_month_or$seg_12 <- rowSums(subset(df_month_or,select =c(`2018_5_n`,`2018_6_n`,`2018_7_n`)), na.rm = TRUE)
+df_month_or$seg_13 <- rowSums(subset(df_month_or,select =c(`2018_6_n`,`2018_7_n`,`2018_8_n`)), na.rm = TRUE)
+df_month_or$seg_14 <- rowSums(subset(df_month_or,select =c(`2018_7_n`,`2018_8_n`,`2018_9_n`)), na.rm = TRUE)
+df_month_or$seg_15 <- rowSums(subset(df_month_or,select =c(`2018_8_n`,`2018_9_n`,`2018_10_n`)), na.rm = TRUE)
+df_month_or$seg_16 <- rowSums(subset(df_month_or,select =c(`2018_9_n`,`2018_10_n`,`2018_11_n`)), na.rm = TRUE)
+df_month_or$seg_17 <- rowSums(subset(df_month_or,select =c(`2018_10_n`,`2018_11_n`,`2018_12_n`)), na.rm = TRUE)
+df_month_or$seg_18 <- rowSums(subset(df_month_or,select =c(`2018_11_n`,`2018_12_n`,`2019_1_n`)), na.rm = TRUE)
+df_month_or$seg_19 <- rowSums(subset(df_month_or,select =c(`2018_12_n`,`2019_1_n`,`2019_2_n`)), na.rm = TRUE)
+df_month_or$seg_20 <- rowSums(subset(df_month_or,select =c(`2019_1_n`,`2019_2_n`,`2019_3_n`)), na.rm = TRUE)
+df_month_or$seg_21 <- rowSums(subset(df_month_or,select =c(`2019_2_n`,`2019_3_n`,`2019_4_n`)), na.rm = TRUE)
+df_month_or$seg_22 <- rowSums(subset(df_month_or,select =c(`2019_3_n`,`2019_4_n`,`2019_5_n`)), na.rm = TRUE)
+df_month_or$seg_23 <- rowSums(subset(df_month_or,select =c(`2019_4_n`,`2019_5_n`,`2019_6_n`)), na.rm = TRUE)
+df_month_or$seg_24 <- rowSums(subset(df_month_or,select =c(`2019_5_n`,`2019_6_n`,`2019_7_n`)), na.rm = TRUE)
+df_month_or$seg_25 <- rowSums(subset(df_month_or,select =c(`2019_6_n`,`2019_7_n`,`2019_8_n`)), na.rm = TRUE)
+df_month_or$seg_26 <- rowSums(subset(df_month_or,select =c(`2019_7_n`,`2019_8_n`,`2019_9_n`)), na.rm = TRUE)
+df_month_or$seg_27 <- rowSums(subset(df_month_or,select =c(`2019_8_n`,`2019_9_n`,`2019_10_n`)), na.rm = TRUE)
+df_month_or$seg_28 <- rowSums(subset(df_month_or,select =c(`2019_9_n`,`2019_10_n`,`2019_11_n`)), na.rm = TRUE)
+df_month_or$seg_29 <- rowSums(subset(df_month_or,select =c(`2019_10_n`,`2019_11_n`,`2019_12_n`)), na.rm = TRUE)
+df_month_or$seg_30 <- rowSums(subset(df_month_or,select =c(`2019_11_n`,`2019_12_n`,`2020_1_n`)), na.rm = TRUE)
+df_month_or$seg_31 <- rowSums(subset(df_month_or,select =c(`2019_12_n`,`2020_1_n`,`2020_2_n`)), na.rm = TRUE)
+df_month_or$seg_32 <- rowSums(subset(df_month_or,select =c(`2020_1_n`,`2020_2_n`,`2020_3_n`)), na.rm = TRUE)
+df_month_or$seg_33 <- rowSums(subset(df_month_or,select =c(`2020_2_n`,`2020_3_n`,`2020_4_n`)), na.rm = TRUE)
+df_month_or$seg_34 <- rowSums(subset(df_month_or,select =c(`2020_3_n`,`2020_4_n`,`2020_5_n`)), na.rm = TRUE)
+df_month_or$seg_35 <- rowSums(subset(df_month_or,select =c(`2020_4_n`,`2020_5_n`,`2020_6_n`)), na.rm = TRUE)
+df_month_or$seg_36 <- rowSums(subset(df_month_or,select =c(`2020_5_n`,`2020_6_n`,`2020_7_n`)), na.rm = TRUE)
+df_month_or$seg_37 <- rowSums(subset(df_month_or,select =c(`2020_6_n`,`2020_7_n`,`2020_8_n`)), na.rm = TRUE)
+df_month_or$seg_38 <- rowSums(subset(df_month_or,select =c(`2020_7_n`,`2020_8_n`,`2020_9_n`)), na.rm = TRUE)
+df_month_or$seg_39 <- rowSums(subset(df_month_or,select =c(`2020_8_n`,`2020_9_n`,`2020_10_n`)), na.rm = TRUE)
+df_month_or$seg_40 <- rowSums(subset(df_month_or,select =c(`2020_9_n`,`2020_10_n`,`2020_11_n`)), na.rm = TRUE)
+df_month_or$seg_41 <- rowSums(subset(df_month_or,select =c(`2020_10_n`,`2020_11_n`,`2020_12_n`)), na.rm = TRUE)
 
 
 df_month_3_o <- df_month_or %>% left_join(df_month_t, by="rider") %>% dplyr::select(rider,segment_date,starts_with("seg")) %>% mutate(n_seg_1_or  =  seg_1/seg_m_1,
@@ -556,47 +558,46 @@ df_month_tr <- df %>% filter(pickup_WL_most_use == "Alger") %>% mutate(month_yea
 
 ####  Normalized original cost
 
-df_month_tr$seg_1 <- rowSums(subset(df_month,select =c(`2017_6_n`,`2017_7_n`,`2017_8_n`)), na.rm = TRUE) 
-
-df_month_tr$seg_2 <- rowSums(subset(df_month,select =c(`2017_7_n`,`2017_8_n`,`2017_9_n`)), na.rm = TRUE)
-df_month_tr$seg_3 <- rowSums(subset(df_month,select =c(`2017_8_n`,`2017_9_n`,`2017_10_n`)), na.rm = TRUE)
-df_month_tr$seg_4 <- rowSums(subset(df_month,select =c(`2017_9_n`,`2017_10_n`,`2017_11_n`)), na.rm = TRUE)
-df_month_tr$seg_5 <- rowSums(subset(df_month,select =c(`2017_10_n`,`2017_11_n`,`2017_12_n`)), na.rm = TRUE)
-df_month_tr$seg_6 <- rowSums(subset(df_month,select =c(`2017_11_n`,`2017_12_n`,`2018_1_n`)), na.rm = TRUE)
-df_month_tr$seg_7 <- rowSums(subset(df_month,select =c(`2017_12_n`,`2018_1_n`,`2018_2_n`)), na.rm = TRUE)
-df_month_tr$seg_8 <- rowSums(subset(df_month,select =c(`2018_1_n`,`2018_2_n`,`2018_3_n`)), na.rm = TRUE)
-df_month_tr$seg_9 <- rowSums(subset(df_month,select =c(`2018_2_n`,`2018_3_n`,`2018_4_n`)), na.rm = TRUE)
-df_month_tr$seg_10 <- rowSums(subset(df_month,select =c(`2018_3_n`,`2018_4_n`,`2018_5_n`)), na.rm = TRUE)
-df_month_tr$seg_11 <- rowSums(subset(df_month,select =c(`2018_4_n`,`2018_5_n`,`2018_6_n`)), na.rm = TRUE)
-df_month_tr$seg_12 <- rowSums(subset(df_month,select =c(`2018_5_n`,`2018_6_n`,`2018_7_n`)), na.rm = TRUE)
-df_month_tr$seg_13 <- rowSums(subset(df_month,select =c(`2018_6_n`,`2018_7_n`,`2018_8_n`)), na.rm = TRUE)
-df_month_tr$seg_14 <- rowSums(subset(df_month,select =c(`2018_7_n`,`2018_8_n`,`2018_9_n`)), na.rm = TRUE)
-df_month_tr$seg_15 <- rowSums(subset(df_month,select =c(`2018_8_n`,`2018_9_n`,`2018_10_n`)), na.rm = TRUE)
-df_month_tr$seg_16 <- rowSums(subset(df_month,select =c(`2018_9_n`,`2018_10_n`,`2018_11_n`)), na.rm = TRUE)
-df_month_tr$seg_17 <- rowSums(subset(df_month,select =c(`2018_10_n`,`2018_11_n`,`2018_12_n`)), na.rm = TRUE)
-df_month_tr$seg_18 <- rowSums(subset(df_month,select =c(`2018_11_n`,`2018_12_n`,`2019_1_n`)), na.rm = TRUE)
-df_month_tr$seg_19 <- rowSums(subset(df_month,select =c(`2018_12_n`,`2019_1_n`,`2019_2_n`)), na.rm = TRUE)
-df_month_tr$seg_20 <- rowSums(subset(df_month,select =c(`2019_1_n`,`2019_2_n`,`2019_3_n`)), na.rm = TRUE)
-df_month_tr$seg_21 <- rowSums(subset(df_month,select =c(`2019_2_n`,`2019_3_n`,`2019_4_n`)), na.rm = TRUE)
-df_month_tr$seg_22 <- rowSums(subset(df_month,select =c(`2019_3_n`,`2019_4_n`,`2019_5_n`)), na.rm = TRUE)
-df_month_tr$seg_23 <- rowSums(subset(df_month,select =c(`2019_4_n`,`2019_5_n`,`2019_6_n`)), na.rm = TRUE)
-df_month_tr$seg_24 <- rowSums(subset(df_month,select =c(`2019_5_n`,`2019_6_n`,`2019_7_n`)), na.rm = TRUE)
-df_month_tr$seg_25 <- rowSums(subset(df_month,select =c(`2019_6_n`,`2019_7_n`,`2019_8_n`)), na.rm = TRUE)
-df_month_tr$seg_26 <- rowSums(subset(df_month,select =c(`2019_7_n`,`2019_8_n`,`2019_9_n`)), na.rm = TRUE)
-df_month_tr$seg_27 <- rowSums(subset(df_month,select =c(`2019_8_n`,`2019_9_n`,`2019_10_n`)), na.rm = TRUE)
-df_month_tr$seg_28 <- rowSums(subset(df_month,select =c(`2019_9_n`,`2019_10_n`,`2019_11_n`)), na.rm = TRUE)
-df_month_tr$seg_29 <- rowSums(subset(df_month,select =c(`2019_10_n`,`2019_11_n`,`2019_12_n`)), na.rm = TRUE)
-df_month_tr$seg_30 <- rowSums(subset(df_month,select =c(`2019_11_n`,`2019_12_n`,`2020_1_n`)), na.rm = TRUE)
-df_month_tr$seg_31 <- rowSums(subset(df_month,select =c(`2019_12_n`,`2020_1_n`,`2020_2_n`)), na.rm = TRUE)
-df_month_tr$seg_32 <- rowSums(subset(df_month,select =c(`2020_1_n`,`2020_2_n`,`2020_3_n`)), na.rm = TRUE)
-df_month_tr$seg_33 <- rowSums(subset(df_month,select =c(`2020_2_n`,`2020_3_n`,`2020_4_n`)), na.rm = TRUE)
-df_month_tr$seg_34 <- rowSums(subset(df_month,select =c(`2020_3_n`,`2020_4_n`,`2020_5_n`)), na.rm = TRUE)
-df_month_tr$seg_35 <- rowSums(subset(df_month,select =c(`2020_4_n`,`2020_5_n`,`2020_6_n`)), na.rm = TRUE)
-df_month_tr$seg_36 <- rowSums(subset(df_month,select =c(`2020_5_n`,`2020_6_n`,`2020_7_n`)), na.rm = TRUE)
-df_month_tr$seg_37 <- rowSums(subset(df_month,select =c(`2020_6_n`,`2020_7_n`,`2020_8_n`)), na.rm = TRUE)
-df_month_tr$seg_38 <- rowSums(subset(df_month,select =c(`2020_7_n`,`2020_8_n`,`2020_9_n`)), na.rm = TRUE)
-df_month_tr$seg_39 <- rowSums(subset(df_month,select =c(`2020_8_n`,`2020_9_n`,`2020_10_n`)), na.rm = TRUE)
-df_month_tr$seg_40 <- rowSums(subset(df_month,select =c(`2020_9_n`,`2020_10_n`,`2020_11_n`)), na.rm = TRUE)
+df_month_tr$seg_1 <- rowSums(subset(df_month_tr,select =c(`2017_6_n`,`2017_7_n`,`2017_8_n`)), na.rm = TRUE) 
+df_month_tr$seg_2 <- rowSums(subset(df_month_tr,select =c(`2017_7_n`,`2017_8_n`,`2017_9_n`)), na.rm = TRUE)
+df_month_tr$seg_3 <- rowSums(subset(df_month_tr,select =c(`2017_8_n`,`2017_9_n`,`2017_10_n`)), na.rm = TRUE)
+df_month_tr$seg_4 <- rowSums(subset(df_month_tr,select =c(`2017_9_n`,`2017_10_n`,`2017_11_n`)), na.rm = TRUE)
+df_month_tr$seg_5 <- rowSums(subset(df_month_tr,select =c(`2017_10_n`,`2017_11_n`,`2017_12_n`)), na.rm = TRUE)
+df_month_tr$seg_6 <- rowSums(subset(df_month_tr,select =c(`2017_11_n`,`2017_12_n`,`2018_1_n`)), na.rm = TRUE)
+df_month_tr$seg_7 <- rowSums(subset(df_month_tr,select =c(`2017_12_n`,`2018_1_n`,`2018_2_n`)), na.rm = TRUE)
+df_month_tr$seg_8 <- rowSums(subset(df_month_tr,select =c(`2018_1_n`,`2018_2_n`,`2018_3_n`)), na.rm = TRUE)
+df_month_tr$seg_9 <- rowSums(subset(df_month_tr,select =c(`2018_2_n`,`2018_3_n`,`2018_4_n`)), na.rm = TRUE)
+df_month_tr$seg_10 <- rowSums(subset(df_month_tr,select =c(`2018_3_n`,`2018_4_n`,`2018_5_n`)), na.rm = TRUE)
+df_month_tr$seg_11 <- rowSums(subset(df_month_tr,select =c(`2018_4_n`,`2018_5_n`,`2018_6_n`)), na.rm = TRUE)
+df_month_tr$seg_12 <- rowSums(subset(df_month_tr,select =c(`2018_5_n`,`2018_6_n`,`2018_7_n`)), na.rm = TRUE)
+df_month_tr$seg_13 <- rowSums(subset(df_month_tr,select =c(`2018_6_n`,`2018_7_n`,`2018_8_n`)), na.rm = TRUE)
+df_month_tr$seg_14 <- rowSums(subset(df_month_tr,select =c(`2018_7_n`,`2018_8_n`,`2018_9_n`)), na.rm = TRUE)
+df_month_tr$seg_15 <- rowSums(subset(df_month_tr,select =c(`2018_8_n`,`2018_9_n`,`2018_10_n`)), na.rm = TRUE)
+df_month_tr$seg_16 <- rowSums(subset(df_month_tr,select =c(`2018_9_n`,`2018_10_n`,`2018_11_n`)), na.rm = TRUE)
+df_month_tr$seg_17 <- rowSums(subset(df_month_tr,select =c(`2018_10_n`,`2018_11_n`,`2018_12_n`)), na.rm = TRUE)
+df_month_tr$seg_18 <- rowSums(subset(df_month_tr,select =c(`2018_11_n`,`2018_12_n`,`2019_1_n`)), na.rm = TRUE)
+df_month_tr$seg_19 <- rowSums(subset(df_month_tr,select =c(`2018_12_n`,`2019_1_n`,`2019_2_n`)), na.rm = TRUE)
+df_month_tr$seg_20 <- rowSums(subset(df_month_tr,select =c(`2019_1_n`,`2019_2_n`,`2019_3_n`)), na.rm = TRUE)
+df_month_tr$seg_21 <- rowSums(subset(df_month_tr,select =c(`2019_2_n`,`2019_3_n`,`2019_4_n`)), na.rm = TRUE)
+df_month_tr$seg_22 <- rowSums(subset(df_month_tr,select =c(`2019_3_n`,`2019_4_n`,`2019_5_n`)), na.rm = TRUE)
+df_month_tr$seg_23 <- rowSums(subset(df_month_tr,select =c(`2019_4_n`,`2019_5_n`,`2019_6_n`)), na.rm = TRUE)
+df_month_tr$seg_24 <- rowSums(subset(df_month_tr,select =c(`2019_5_n`,`2019_6_n`,`2019_7_n`)), na.rm = TRUE)
+df_month_tr$seg_25 <- rowSums(subset(df_month_tr,select =c(`2019_6_n`,`2019_7_n`,`2019_8_n`)), na.rm = TRUE)
+df_month_tr$seg_26 <- rowSums(subset(df_month_tr,select =c(`2019_7_n`,`2019_8_n`,`2019_9_n`)), na.rm = TRUE)
+df_month_tr$seg_27 <- rowSums(subset(df_month_tr,select =c(`2019_8_n`,`2019_9_n`,`2019_10_n`)), na.rm = TRUE)
+df_month_tr$seg_28 <- rowSums(subset(df_month_tr,select =c(`2019_9_n`,`2019_10_n`,`2019_11_n`)), na.rm = TRUE)
+df_month_tr$seg_29 <- rowSums(subset(df_month_tr,select =c(`2019_10_n`,`2019_11_n`,`2019_12_n`)), na.rm = TRUE)
+df_month_tr$seg_30 <- rowSums(subset(df_month_tr,select =c(`2019_11_n`,`2019_12_n`,`2020_1_n`)), na.rm = TRUE)
+df_month_tr$seg_31 <- rowSums(subset(df_month_tr,select =c(`2019_12_n`,`2020_1_n`,`2020_2_n`)), na.rm = TRUE)
+df_month_tr$seg_32 <- rowSums(subset(df_month_tr,select =c(`2020_1_n`,`2020_2_n`,`2020_3_n`)), na.rm = TRUE)
+df_month_tr$seg_33 <- rowSums(subset(df_month_tr,select =c(`2020_2_n`,`2020_3_n`,`2020_4_n`)), na.rm = TRUE)
+df_month_tr$seg_34 <- rowSums(subset(df_month_tr,select =c(`2020_3_n`,`2020_4_n`,`2020_5_n`)), na.rm = TRUE)
+df_month_tr$seg_35 <- rowSums(subset(df_month_tr,select =c(`2020_4_n`,`2020_5_n`,`2020_6_n`)), na.rm = TRUE)
+df_month_tr$seg_36 <- rowSums(subset(df_month_tr,select =c(`2020_5_n`,`2020_6_n`,`2020_7_n`)), na.rm = TRUE)
+df_month_tr$seg_37 <- rowSums(subset(df_month_tr,select =c(`2020_6_n`,`2020_7_n`,`2020_8_n`)), na.rm = TRUE)
+df_month_tr$seg_38 <- rowSums(subset(df_month_tr,select =c(`2020_7_n`,`2020_8_n`,`2020_9_n`)), na.rm = TRUE)
+df_month_tr$seg_39 <- rowSums(subset(df_month_tr,select =c(`2020_8_n`,`2020_9_n`,`2020_10_n`)), na.rm = TRUE)
+df_month_tr$seg_40 <- rowSums(subset(df_month_tr,select =c(`2020_9_n`,`2020_10_n`,`2020_11_n`)), na.rm = TRUE)
 df_month_tr$seg_41 <- rowSums(subset(df_month,select =c(`2020_10_n`,`2020_11_n`,`2020_12_n`)), na.rm = TRUE)
 
 
@@ -737,48 +738,48 @@ df_month_rv <- df %>% filter(pickup_WL_most_use == "Alger") %>% mutate(month_yea
 
 ####  Normalized original cost
 
-df_month_rv$seg_1 <- rowSums(subset(df_month,select =c(`2017_6_n`,`2017_7_n`,`2017_8_n`)), na.rm = TRUE) 
+df_month_rv$seg_1 <- rowSums(subset(df_month_rv,select =c(`2017_6_n`,`2017_7_n`,`2017_8_n`)), na.rm = TRUE) 
 
-df_month_rv$seg_2 <- rowSums(subset(df_month,select =c(`2017_7_n`,`2017_8_n`,`2017_9_n`)), na.rm = TRUE)
-df_month_rv$seg_3 <- rowSums(subset(df_month,select =c(`2017_8_n`,`2017_9_n`,`2017_10_n`)), na.rm = TRUE)
-df_month_rv$seg_4 <- rowSums(subset(df_month,select =c(`2017_9_n`,`2017_10_n`,`2017_11_n`)), na.rm = TRUE)
-df_month_rv$seg_5 <- rowSums(subset(df_month,select =c(`2017_10_n`,`2017_11_n`,`2017_12_n`)), na.rm = TRUE)
-df_month_rv$seg_6 <- rowSums(subset(df_month,select =c(`2017_11_n`,`2017_12_n`,`2018_1_n`)), na.rm = TRUE)
-df_month_rv$seg_7 <- rowSums(subset(df_month,select =c(`2017_12_n`,`2018_1_n`,`2018_2_n`)), na.rm = TRUE)
-df_month_rv$seg_8 <- rowSums(subset(df_month,select =c(`2018_1_n`,`2018_2_n`,`2018_3_n`)), na.rm = TRUE)
-df_month_rv$seg_9 <- rowSums(subset(df_month,select =c(`2018_2_n`,`2018_3_n`,`2018_4_n`)), na.rm = TRUE)
-df_month_rv$seg_10 <- rowSums(subset(df_month,select =c(`2018_3_n`,`2018_4_n`,`2018_5_n`)), na.rm = TRUE)
-df_month_rv$seg_11 <- rowSums(subset(df_month,select =c(`2018_4_n`,`2018_5_n`,`2018_6_n`)), na.rm = TRUE)
-df_month_rv$seg_12 <- rowSums(subset(df_month,select =c(`2018_5_n`,`2018_6_n`,`2018_7_n`)), na.rm = TRUE)
-df_month_rv$seg_13 <- rowSums(subset(df_month,select =c(`2018_6_n`,`2018_7_n`,`2018_8_n`)), na.rm = TRUE)
-df_month_rv$seg_14 <- rowSums(subset(df_month,select =c(`2018_7_n`,`2018_8_n`,`2018_9_n`)), na.rm = TRUE)
-df_month_rv$seg_15 <- rowSums(subset(df_month,select =c(`2018_8_n`,`2018_9_n`,`2018_10_n`)), na.rm = TRUE)
-df_month_rv$seg_16 <- rowSums(subset(df_month,select =c(`2018_9_n`,`2018_10_n`,`2018_11_n`)), na.rm = TRUE)
-df_month_rv$seg_17 <- rowSums(subset(df_month,select =c(`2018_10_n`,`2018_11_n`,`2018_12_n`)), na.rm = TRUE)
-df_month_rv$seg_18 <- rowSums(subset(df_month,select =c(`2018_11_n`,`2018_12_n`,`2019_1_n`)), na.rm = TRUE)
-df_month_rv$seg_19 <- rowSums(subset(df_month,select =c(`2018_12_n`,`2019_1_n`,`2019_2_n`)), na.rm = TRUE)
-df_month_rv$seg_20 <- rowSums(subset(df_month,select =c(`2019_1_n`,`2019_2_n`,`2019_3_n`)), na.rm = TRUE)
-df_month_rv$seg_21 <- rowSums(subset(df_month,select =c(`2019_2_n`,`2019_3_n`,`2019_4_n`)), na.rm = TRUE)
-df_month_rv$seg_22 <- rowSums(subset(df_month,select =c(`2019_3_n`,`2019_4_n`,`2019_5_n`)), na.rm = TRUE)
-df_month_rv$seg_23 <- rowSums(subset(df_month,select =c(`2019_4_n`,`2019_5_n`,`2019_6_n`)), na.rm = TRUE)
-df_month_rv$seg_24 <- rowSums(subset(df_month,select =c(`2019_5_n`,`2019_6_n`,`2019_7_n`)), na.rm = TRUE)
-df_month_rv$seg_25 <- rowSums(subset(df_month,select =c(`2019_6_n`,`2019_7_n`,`2019_8_n`)), na.rm = TRUE)
-df_month_rv$seg_26 <- rowSums(subset(df_month,select =c(`2019_7_n`,`2019_8_n`,`2019_9_n`)), na.rm = TRUE)
-df_month_rv$seg_27 <- rowSums(subset(df_month,select =c(`2019_8_n`,`2019_9_n`,`2019_10_n`)), na.rm = TRUE)
-df_month_rv$seg_28 <- rowSums(subset(df_month,select =c(`2019_9_n`,`2019_10_n`,`2019_11_n`)), na.rm = TRUE)
-df_month_rv$seg_29 <- rowSums(subset(df_month,select =c(`2019_10_n`,`2019_11_n`,`2019_12_n`)), na.rm = TRUE)
-df_month_rv$seg_30 <- rowSums(subset(df_month,select =c(`2019_11_n`,`2019_12_n`,`2020_1_n`)), na.rm = TRUE)
-df_month_rv$seg_31 <- rowSums(subset(df_month,select =c(`2019_12_n`,`2020_1_n`,`2020_2_n`)), na.rm = TRUE)
-df_month_rv$seg_32 <- rowSums(subset(df_month,select =c(`2020_1_n`,`2020_2_n`,`2020_3_n`)), na.rm = TRUE)
-df_month_rv$seg_33 <- rowSums(subset(df_month,select =c(`2020_2_n`,`2020_3_n`,`2020_4_n`)), na.rm = TRUE)
-df_month_rv$seg_34 <- rowSums(subset(df_month,select =c(`2020_3_n`,`2020_4_n`,`2020_5_n`)), na.rm = TRUE)
-df_month_rv$seg_35 <- rowSums(subset(df_month,select =c(`2020_4_n`,`2020_5_n`,`2020_6_n`)), na.rm = TRUE)
-df_month_rv$seg_36 <- rowSums(subset(df_month,select =c(`2020_5_n`,`2020_6_n`,`2020_7_n`)), na.rm = TRUE)
-df_month_rv$seg_37 <- rowSums(subset(df_month,select =c(`2020_6_n`,`2020_7_n`,`2020_8_n`)), na.rm = TRUE)
-df_month_rv$seg_38 <- rowSums(subset(df_month,select =c(`2020_7_n`,`2020_8_n`,`2020_9_n`)), na.rm = TRUE)
-df_month_rv$seg_39 <- rowSums(subset(df_month,select =c(`2020_8_n`,`2020_9_n`,`2020_10_n`)), na.rm = TRUE)
-df_month_rv$seg_40 <- rowSums(subset(df_month,select =c(`2020_9_n`,`2020_10_n`,`2020_11_n`)), na.rm = TRUE)
-df_month_rv$seg_41 <- rowSums(subset(df_month,select =c(`2020_10_n`,`2020_11_n`,`2020_12_n`)), na.rm = TRUE)
+df_month_rv$seg_2 <- rowSums(subset(df_month_rv,select =c(`2017_7_n`,`2017_8_n`,`2017_9_n`)), na.rm = TRUE)
+df_month_rv$seg_3 <- rowSums(subset(df_month_rv,select =c(`2017_8_n`,`2017_9_n`,`2017_10_n`)), na.rm = TRUE)
+df_month_rv$seg_4 <- rowSums(subset(df_month_rv,select =c(`2017_9_n`,`2017_10_n`,`2017_11_n`)), na.rm = TRUE)
+df_month_rv$seg_5 <- rowSums(subset(df_month_rv,select =c(`2017_10_n`,`2017_11_n`,`2017_12_n`)), na.rm = TRUE)
+df_month_rv$seg_6 <- rowSums(subset(df_month_rv,select =c(`2017_11_n`,`2017_12_n`,`2018_1_n`)), na.rm = TRUE)
+df_month_rv$seg_7 <- rowSums(subset(df_month_rv,select =c(`2017_12_n`,`2018_1_n`,`2018_2_n`)), na.rm = TRUE)
+df_month_rv$seg_8 <- rowSums(subset(df_month_rv,select =c(`2018_1_n`,`2018_2_n`,`2018_3_n`)), na.rm = TRUE)
+df_month_rv$seg_9 <- rowSums(subset(df_month_rv,select =c(`2018_2_n`,`2018_3_n`,`2018_4_n`)), na.rm = TRUE)
+df_month_rv$seg_10 <- rowSums(subset(df_month_rv,select =c(`2018_3_n`,`2018_4_n`,`2018_5_n`)), na.rm = TRUE)
+df_month_rv$seg_11 <- rowSums(subset(df_month_rv,select =c(`2018_4_n`,`2018_5_n`,`2018_6_n`)), na.rm = TRUE)
+df_month_rv$seg_12 <- rowSums(subset(df_month_rv,select =c(`2018_5_n`,`2018_6_n`,`2018_7_n`)), na.rm = TRUE)
+df_month_rv$seg_13 <- rowSums(subset(df_month_rv,select =c(`2018_6_n`,`2018_7_n`,`2018_8_n`)), na.rm = TRUE)
+df_month_rv$seg_14 <- rowSums(subset(df_month_rv,select =c(`2018_7_n`,`2018_8_n`,`2018_9_n`)), na.rm = TRUE)
+df_month_rv$seg_15 <- rowSums(subset(df_month_rv,select =c(`2018_8_n`,`2018_9_n`,`2018_10_n`)), na.rm = TRUE)
+df_month_rv$seg_16 <- rowSums(subset(df_month_rv,select =c(`2018_9_n`,`2018_10_n`,`2018_11_n`)), na.rm = TRUE)
+df_month_rv$seg_17 <- rowSums(subset(df_month_rv,select =c(`2018_10_n`,`2018_11_n`,`2018_12_n`)), na.rm = TRUE)
+df_month_rv$seg_18 <- rowSums(subset(df_month_rv,select =c(`2018_11_n`,`2018_12_n`,`2019_1_n`)), na.rm = TRUE)
+df_month_rv$seg_19 <- rowSums(subset(df_month_rv,select =c(`2018_12_n`,`2019_1_n`,`2019_2_n`)), na.rm = TRUE)
+df_month_rv$seg_20 <- rowSums(subset(df_month_rv,select =c(`2019_1_n`,`2019_2_n`,`2019_3_n`)), na.rm = TRUE)
+df_month_rv$seg_21 <- rowSums(subset(df_month_rv,select =c(`2019_2_n`,`2019_3_n`,`2019_4_n`)), na.rm = TRUE)
+df_month_rv$seg_22 <- rowSums(subset(df_month_rv,select =c(`2019_3_n`,`2019_4_n`,`2019_5_n`)), na.rm = TRUE)
+df_month_rv$seg_23 <- rowSums(subset(df_month_rv,select =c(`2019_4_n`,`2019_5_n`,`2019_6_n`)), na.rm = TRUE)
+df_month_rv$seg_24 <- rowSums(subset(df_month_rv,select =c(`2019_5_n`,`2019_6_n`,`2019_7_n`)), na.rm = TRUE)
+df_month_rv$seg_25 <- rowSums(subset(df_month_rv,select =c(`2019_6_n`,`2019_7_n`,`2019_8_n`)), na.rm = TRUE)
+df_month_rv$seg_26 <- rowSums(subset(df_month_rv,select =c(`2019_7_n`,`2019_8_n`,`2019_9_n`)), na.rm = TRUE)
+df_month_rv$seg_27 <- rowSums(subset(df_month_rv,select =c(`2019_8_n`,`2019_9_n`,`2019_10_n`)), na.rm = TRUE)
+df_month_rv$seg_28 <- rowSums(subset(df_month_rv,select =c(`2019_9_n`,`2019_10_n`,`2019_11_n`)), na.rm = TRUE)
+df_month_rv$seg_29 <- rowSums(subset(df_month_rv,select =c(`2019_10_n`,`2019_11_n`,`2019_12_n`)), na.rm = TRUE)
+df_month_rv$seg_30 <- rowSums(subset(df_month_rv,select =c(`2019_11_n`,`2019_12_n`,`2020_1_n`)), na.rm = TRUE)
+df_month_rv$seg_31 <- rowSums(subset(df_month_rv,select =c(`2019_12_n`,`2020_1_n`,`2020_2_n`)), na.rm = TRUE)
+df_month_rv$seg_32 <- rowSums(subset(df_month_rv,select =c(`2020_1_n`,`2020_2_n`,`2020_3_n`)), na.rm = TRUE)
+df_month_rv$seg_33 <- rowSums(subset(df_month_rv,select =c(`2020_2_n`,`2020_3_n`,`2020_4_n`)), na.rm = TRUE)
+df_month_rv$seg_34 <- rowSums(subset(df_month_rv,select =c(`2020_3_n`,`2020_4_n`,`2020_5_n`)), na.rm = TRUE)
+df_month_rv$seg_35 <- rowSums(subset(df_month_rv,select =c(`2020_4_n`,`2020_5_n`,`2020_6_n`)), na.rm = TRUE)
+df_month_rv$seg_36 <- rowSums(subset(df_month_rv,select =c(`2020_5_n`,`2020_6_n`,`2020_7_n`)), na.rm = TRUE)
+df_month_rv$seg_37 <- rowSums(subset(df_month_rv,select =c(`2020_6_n`,`2020_7_n`,`2020_8_n`)), na.rm = TRUE)
+df_month_rv$seg_38 <- rowSums(subset(df_month_rv,select =c(`2020_7_n`,`2020_8_n`,`2020_9_n`)), na.rm = TRUE)
+df_month_rv$seg_39 <- rowSums(subset(df_month_rv,select =c(`2020_8_n`,`2020_9_n`,`2020_10_n`)), na.rm = TRUE)
+df_month_rv$seg_40 <- rowSums(subset(df_month_rv,select =c(`2020_9_n`,`2020_10_n`,`2020_11_n`)), na.rm = TRUE)
+df_month_rv$seg_41 <- rowSums(subset(df_month_rv,select =c(`2020_10_n`,`2020_11_n`,`2020_12_n`)), na.rm = TRUE)
 
 
 df_month_3_v <- df_month_rv %>% left_join(df_month_t, by="rider") %>% dplyr::select(rider,segment_date,starts_with("seg")) %>% mutate(n_seg_1_rv  =  seg_1/seg_m_1,
@@ -864,7 +865,7 @@ rv_seg_39=seg_39,
 rv_seg_40=seg_40,
 rv_seg_41=seg_41
 
-) %>% dplyr::select(rider,starts_with("n"),starts_with("o"))%>% mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .))) 
+) %>% dplyr::select(rider,starts_with("n"),starts_with("rv"))%>% mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .))) 
 
 is.num <- sapply(df_month_3_v, is.numeric)
 df_month_3_v[is.num] <- lapply(df_month_3_v[is.num], round, 0)
@@ -921,48 +922,48 @@ df_month_tr <- df %>% filter(pickup_WL_most_use == "Alger") %>% mutate(month_yea
 
 ####  Normalized original cost
 
-df_month_tr$seg_1 <- rowSums(subset(df_month,select =c(`2017_6_n`,`2017_7_n`,`2017_8_n`)), na.rm = TRUE) 
+df_month_tr$seg_1 <- rowSums(subset(df_month_tr,select =c(`2017_6_n`,`2017_7_n`,`2017_8_n`)), na.rm = TRUE) 
 
-df_month_tr$seg_2 <- rowSums(subset(df_month,select =c(`2017_7_n`,`2017_8_n`,`2017_9_n`)), na.rm = TRUE)
-df_month_tr$seg_3 <- rowSums(subset(df_month,select =c(`2017_8_n`,`2017_9_n`,`2017_10_n`)), na.rm = TRUE)
-df_month_tr$seg_4 <- rowSums(subset(df_month,select =c(`2017_9_n`,`2017_10_n`,`2017_11_n`)), na.rm = TRUE)
+df_month_tr$seg_2 <- rowSums(subset(df_month_tr,select =c(`2017_7_n`,`2017_8_n`,`2017_9_n`)), na.rm = TRUE)
+df_month_tr$seg_3 <- rowSums(subset(df_month_tr,select =c(`2017_8_n`,`2017_9_n`,`2017_10_n`)), na.rm = TRUE)
+df_month_tr$seg_4 <- rowSums(subset(df_month_tr,select =c(`2017_9_n`,`2017_10_n`,`2017_11_n`)), na.rm = TRUE)
 df_month_tr$seg_5 <- rowSums(subset(df_month,select =c(`2017_10_n`,`2017_11_n`,`2017_12_n`)), na.rm = TRUE)
-df_month_tr$seg_6 <- rowSums(subset(df_month,select =c(`2017_11_n`,`2017_12_n`,`2018_1_n`)), na.rm = TRUE)
-df_month_tr$seg_7 <- rowSums(subset(df_month,select =c(`2017_12_n`,`2018_1_n`,`2018_2_n`)), na.rm = TRUE)
-df_month_tr$seg_8 <- rowSums(subset(df_month,select =c(`2018_1_n`,`2018_2_n`,`2018_3_n`)), na.rm = TRUE)
-df_month_tr$seg_9 <- rowSums(subset(df_month,select =c(`2018_2_n`,`2018_3_n`,`2018_4_n`)), na.rm = TRUE)
-df_month_tr$seg_10 <- rowSums(subset(df_month,select =c(`2018_3_n`,`2018_4_n`,`2018_5_n`)), na.rm = TRUE)
-df_month_tr$seg_11 <- rowSums(subset(df_month,select =c(`2018_4_n`,`2018_5_n`,`2018_6_n`)), na.rm = TRUE)
-df_month_tr$seg_12 <- rowSums(subset(df_month,select =c(`2018_5_n`,`2018_6_n`,`2018_7_n`)), na.rm = TRUE)
-df_month_tr$seg_13 <- rowSums(subset(df_month,select =c(`2018_6_n`,`2018_7_n`,`2018_8_n`)), na.rm = TRUE)
-df_month_tr$seg_14 <- rowSums(subset(df_month,select =c(`2018_7_n`,`2018_8_n`,`2018_9_n`)), na.rm = TRUE)
-df_month_tr$seg_15 <- rowSums(subset(df_month,select =c(`2018_8_n`,`2018_9_n`,`2018_10_n`)), na.rm = TRUE)
-df_month_tr$seg_16 <- rowSums(subset(df_month,select =c(`2018_9_n`,`2018_10_n`,`2018_11_n`)), na.rm = TRUE)
-df_month_tr$seg_17 <- rowSums(subset(df_month,select =c(`2018_10_n`,`2018_11_n`,`2018_12_n`)), na.rm = TRUE)
-df_month_tr$seg_18 <- rowSums(subset(df_month,select =c(`2018_11_n`,`2018_12_n`,`2019_1_n`)), na.rm = TRUE)
-df_month_tr$seg_19 <- rowSums(subset(df_month,select =c(`2018_12_n`,`2019_1_n`,`2019_2_n`)), na.rm = TRUE)
-df_month_tr$seg_20 <- rowSums(subset(df_month,select =c(`2019_1_n`,`2019_2_n`,`2019_3_n`)), na.rm = TRUE)
-df_month_tr$seg_21 <- rowSums(subset(df_month,select =c(`2019_2_n`,`2019_3_n`,`2019_4_n`)), na.rm = TRUE)
-df_month_tr$seg_22 <- rowSums(subset(df_month,select =c(`2019_3_n`,`2019_4_n`,`2019_5_n`)), na.rm = TRUE)
-df_month_tr$seg_23 <- rowSums(subset(df_month,select =c(`2019_4_n`,`2019_5_n`,`2019_6_n`)), na.rm = TRUE)
-df_month_tr$seg_24 <- rowSums(subset(df_month,select =c(`2019_5_n`,`2019_6_n`,`2019_7_n`)), na.rm = TRUE)
-df_month_tr$seg_25 <- rowSums(subset(df_month,select =c(`2019_6_n`,`2019_7_n`,`2019_8_n`)), na.rm = TRUE)
-df_month_tr$seg_26 <- rowSums(subset(df_month,select =c(`2019_7_n`,`2019_8_n`,`2019_9_n`)), na.rm = TRUE)
-df_month_tr$seg_27 <- rowSums(subset(df_month,select =c(`2019_8_n`,`2019_9_n`,`2019_10_n`)), na.rm = TRUE)
-df_month_tr$seg_28 <- rowSums(subset(df_month,select =c(`2019_9_n`,`2019_10_n`,`2019_11_n`)), na.rm = TRUE)
-df_month_tr$seg_29 <- rowSums(subset(df_month,select =c(`2019_10_n`,`2019_11_n`,`2019_12_n`)), na.rm = TRUE)
-df_month_tr$seg_30 <- rowSums(subset(df_month,select =c(`2019_11_n`,`2019_12_n`,`2020_1_n`)), na.rm = TRUE)
-df_month_tr$seg_31 <- rowSums(subset(df_month,select =c(`2019_12_n`,`2020_1_n`,`2020_2_n`)), na.rm = TRUE)
-df_month_tr$seg_32 <- rowSums(subset(df_month,select =c(`2020_1_n`,`2020_2_n`,`2020_3_n`)), na.rm = TRUE)
-df_month_tr$seg_33 <- rowSums(subset(df_month,select =c(`2020_2_n`,`2020_3_n`,`2020_4_n`)), na.rm = TRUE)
-df_month_tr$seg_34 <- rowSums(subset(df_month,select =c(`2020_3_n`,`2020_4_n`,`2020_5_n`)), na.rm = TRUE)
-df_month_tr$seg_35 <- rowSums(subset(df_month,select =c(`2020_4_n`,`2020_5_n`,`2020_6_n`)), na.rm = TRUE)
-df_month_tr$seg_36 <- rowSums(subset(df_month,select =c(`2020_5_n`,`2020_6_n`,`2020_7_n`)), na.rm = TRUE)
-df_month_tr$seg_37 <- rowSums(subset(df_month,select =c(`2020_6_n`,`2020_7_n`,`2020_8_n`)), na.rm = TRUE)
-df_month_tr$seg_38 <- rowSums(subset(df_month,select =c(`2020_7_n`,`2020_8_n`,`2020_9_n`)), na.rm = TRUE)
-df_month_tr$seg_39 <- rowSums(subset(df_month,select =c(`2020_8_n`,`2020_9_n`,`2020_10_n`)), na.rm = TRUE)
-df_month_tr$seg_40 <- rowSums(subset(df_month,select =c(`2020_9_n`,`2020_10_n`,`2020_11_n`)), na.rm = TRUE)
-df_month_tr$seg_41 <- rowSums(subset(df_month,select =c(`2020_10_n`,`2020_11_n`,`2020_12_n`)), na.rm = TRUE)
+df_month_tr$seg_6 <- rowSums(subset(df_month_tr,select =c(`2017_11_n`,`2017_12_n`,`2018_1_n`)), na.rm = TRUE)
+df_month_tr$seg_7 <- rowSums(subset(df_month_tr,select =c(`2017_12_n`,`2018_1_n`,`2018_2_n`)), na.rm = TRUE)
+df_month_tr$seg_8 <- rowSums(subset(df_month_tr,select =c(`2018_1_n`,`2018_2_n`,`2018_3_n`)), na.rm = TRUE)
+df_month_tr$seg_9 <- rowSums(subset(df_month_tr,select =c(`2018_2_n`,`2018_3_n`,`2018_4_n`)), na.rm = TRUE)
+df_month_tr$seg_10 <- rowSums(subset(df_month_tr,select =c(`2018_3_n`,`2018_4_n`,`2018_5_n`)), na.rm = TRUE)
+df_month_tr$seg_11 <- rowSums(subset(df_month_tr,select =c(`2018_4_n`,`2018_5_n`,`2018_6_n`)), na.rm = TRUE)
+df_month_tr$seg_12 <- rowSums(subset(df_month_tr,select =c(`2018_5_n`,`2018_6_n`,`2018_7_n`)), na.rm = TRUE)
+df_month_tr$seg_13 <- rowSums(subset(df_month_tr,select =c(`2018_6_n`,`2018_7_n`,`2018_8_n`)), na.rm = TRUE)
+df_month_tr$seg_14 <- rowSums(subset(df_month_tr,select =c(`2018_7_n`,`2018_8_n`,`2018_9_n`)), na.rm = TRUE)
+df_month_tr$seg_15 <- rowSums(subset(df_month_tr,select =c(`2018_8_n`,`2018_9_n`,`2018_10_n`)), na.rm = TRUE)
+df_month_tr$seg_16 <- rowSums(subset(df_month_tr,select =c(`2018_9_n`,`2018_10_n`,`2018_11_n`)), na.rm = TRUE)
+df_month_tr$seg_17 <- rowSums(subset(df_month_tr,select =c(`2018_10_n`,`2018_11_n`,`2018_12_n`)), na.rm = TRUE)
+df_month_tr$seg_18 <- rowSums(subset(df_month_tr,select =c(`2018_11_n`,`2018_12_n`,`2019_1_n`)), na.rm = TRUE)
+df_month_tr$seg_19 <- rowSums(subset(df_month_tr,select =c(`2018_12_n`,`2019_1_n`,`2019_2_n`)), na.rm = TRUE)
+df_month_tr$seg_20 <- rowSums(subset(df_month_tr,select =c(`2019_1_n`,`2019_2_n`,`2019_3_n`)), na.rm = TRUE)
+df_month_tr$seg_21 <- rowSums(subset(df_month_tr,select =c(`2019_2_n`,`2019_3_n`,`2019_4_n`)), na.rm = TRUE)
+df_month_tr$seg_22 <- rowSums(subset(df_month_tr,select =c(`2019_3_n`,`2019_4_n`,`2019_5_n`)), na.rm = TRUE)
+df_month_tr$seg_23 <- rowSums(subset(df_month_tr,select =c(`2019_4_n`,`2019_5_n`,`2019_6_n`)), na.rm = TRUE)
+df_month_tr$seg_24 <- rowSums(subset(df_month_tr,select =c(`2019_5_n`,`2019_6_n`,`2019_7_n`)), na.rm = TRUE)
+df_month_tr$seg_25 <- rowSums(subset(df_month_tr,select =c(`2019_6_n`,`2019_7_n`,`2019_8_n`)), na.rm = TRUE)
+df_month_tr$seg_26 <- rowSums(subset(df_month_tr,select =c(`2019_7_n`,`2019_8_n`,`2019_9_n`)), na.rm = TRUE)
+df_month_tr$seg_27 <- rowSums(subset(df_month_tr,select =c(`2019_8_n`,`2019_9_n`,`2019_10_n`)), na.rm = TRUE)
+df_month_tr$seg_28 <- rowSums(subset(df_month_tr,select =c(`2019_9_n`,`2019_10_n`,`2019_11_n`)), na.rm = TRUE)
+df_month_tr$seg_29 <- rowSums(subset(df_month_tr,select =c(`2019_10_n`,`2019_11_n`,`2019_12_n`)), na.rm = TRUE)
+df_month_tr$seg_30 <- rowSums(subset(df_month_tr,select =c(`2019_11_n`,`2019_12_n`,`2020_1_n`)), na.rm = TRUE)
+df_month_tr$seg_31 <- rowSums(subset(df_month_tr,select =c(`2019_12_n`,`2020_1_n`,`2020_2_n`)), na.rm = TRUE)
+df_month_tr$seg_32 <- rowSums(subset(df_month_tr,select =c(`2020_1_n`,`2020_2_n`,`2020_3_n`)), na.rm = TRUE)
+df_month_tr$seg_33 <- rowSums(subset(df_month_tr,select =c(`2020_2_n`,`2020_3_n`,`2020_4_n`)), na.rm = TRUE)
+df_month_tr$seg_34 <- rowSums(subset(df_month_tr,select =c(`2020_3_n`,`2020_4_n`,`2020_5_n`)), na.rm = TRUE)
+df_month_tr$seg_35 <- rowSums(subset(df_month_tr,select =c(`2020_4_n`,`2020_5_n`,`2020_6_n`)), na.rm = TRUE)
+df_month_tr$seg_36 <- rowSums(subset(df_month_tr,select =c(`2020_5_n`,`2020_6_n`,`2020_7_n`)), na.rm = TRUE)
+df_month_tr$seg_37 <- rowSums(subset(df_month_tr,select =c(`2020_6_n`,`2020_7_n`,`2020_8_n`)), na.rm = TRUE)
+df_month_tr$seg_38 <- rowSums(subset(df_month_tr,select =c(`2020_7_n`,`2020_8_n`,`2020_9_n`)), na.rm = TRUE)
+df_month_tr$seg_39 <- rowSums(subset(df_month_tr,select =c(`2020_8_n`,`2020_9_n`,`2020_10_n`)), na.rm = TRUE)
+df_month_tr$seg_40 <- rowSums(subset(df_month_tr,select =c(`2020_9_n`,`2020_10_n`,`2020_11_n`)), na.rm = TRUE)
+df_month_tr$seg_41 <- rowSums(subset(df_month_tr,select =c(`2020_10_n`,`2020_11_n`,`2020_12_n`)), na.rm = TRUE)
 
 
 df_month_3_tr <- df_month_tr %>% left_join(df_month_t, by="rider") %>% dplyr::select(rider,segment_date,starts_with("seg")) %>% mutate(n_seg_1_tr  =  seg_1/seg_m_1,
@@ -1050,10 +1051,10 @@ t_seg_41=seg_41) %>% dplyr::select(rider,starts_with("n"),starts_with("t"))%>% m
 
 is.num <- sapply(df_month_3_tr, is.numeric)
 df_month_3_tr[is.num] <- lapply(df_month_3_tr[is.num], round, 0)
+```
 
 
-####
-
+```{r}
 ### Segment Before Covid 19:
 
 df_cum <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31 > 0 ) %>% dplyr::select(rider,n_seg_31)%>% 
@@ -1066,7 +1067,7 @@ df_cum <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31 > 0 ) %>% dpl
                                               ggplot(aes(n_seg_31,Cum_effective))+
                                               geom_line(color = "red")+
                                               geom_line(color = "red")+
-                                              geom_vline(xintercept=12500, linetype="dashed", color = "black")+
+                                              geom_vline(xintercept=5000, linetype="dashed", color = "black")+
                                              
                                               geom_hline(yintercept=95, linetype="dashed", color = "black")+
                                              
@@ -1082,7 +1083,7 @@ box_plot_n_seg_31 <- df_month_3 %>% filter(segment_date <= '2020-02') %>% filter
    scale_y_log10()
 box_plot_n_seg_31
 
-box_plot_n_seg_31_s <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31>0) %>% mutate(segment=ifelse(n_seg_31<12500,'Inf_12500','Sup_12500')) %>% dplyr::select(rider,n_seg_31,segment) %>%  ggplot(aes(x = "", y = n_seg_31,color=segment)) +
+box_plot_n_seg_31_s <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31>0) %>% mutate(segment=ifelse(n_seg_31<5000,'Inf_5000','Sup_5000')) %>% dplyr::select(rider,n_seg_31,segment) %>%  ggplot(aes(x = "", y = n_seg_31,color=segment)) +
    geom_boxplot()+
    scale_y_log10()
 box_plot_n_seg_31_s
@@ -1090,19 +1091,19 @@ box_plot_n_seg_31_s
 ```{r}
 df_month_3
 ### Agregation 
-segment_12_01_02_over_all_agregation <- df_month_3 %>% filter(segment_date <= '2020-02') %>% dplyr::select(n_seg_31) %>% mutate(segment=ifelse(n_seg_31 <= 0,'Dormant',ifelse(n_seg_31<=12500,'Inf_12500','Sup_12500'))) %>% group_by(segment) %>% summarise(riders= n()) %>% mutate(ttl_rider=sum(riders),percentage= riders/ttl_rider*100) %>% arrange(desc(ttl_rider))
+segment_12_01_02_over_all_agregation <- df_month_3 %>% filter(segment_date <= '2020-02') %>% dplyr::select(n_seg_31) %>% mutate(segment=ifelse(n_seg_31 <= 0,'Dormant',ifelse(n_seg_31<=12500,'Inf_5000','Sup_5000'))) %>% group_by(segment) %>% summarise(riders= n()) %>% mutate(ttl_rider=sum(riders),percentage= riders/ttl_rider*100) %>% arrange(desc(ttl_rider))
 segment_12_01_02_over_all_agregation
 #### Over All 
 segment_12_01_02_over_all <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31>0) %>% dplyr::select(n_seg_31)
 
-#### Inf_12500
-segment_12_01_02_inf_12500 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31>0) %>% mutate(segment=ifelse(n_seg_31<=12500,'Inf_12500','Sup_12500')) %>% filter(segment =='Inf_12500') %>% dplyr::select(n_seg_31)
-#### Sup_12500
-segment_12_01_02_sup_12500 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31>0) %>% mutate(segment=ifelse(n_seg_31<=12500,'Inf_12500','Sup_12500')) %>% filter(segment =='Sup_12500') %>% dplyr::select(n_seg_31)
+#### Inf_5000
+segment_12_01_02_inf_5000 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31>0) %>% mutate(segment=ifelse(n_seg_31<=5000,'Inf_5000','Sup_5000')) %>% filter(segment =='Inf_5000') %>% dplyr::select(n_seg_31)
+#### Sup_5000
+segment_12_01_02_sup_5000 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31>0) %>% mutate(segment=ifelse(n_seg_31<=5000,'Inf_5000','Sup_5000')) %>% filter(segment =='Sup_5000') %>% dplyr::select(n_seg_31)
 ## Kmeans Alorythm details segment_12_01_02_inf_12500
 set.seed(123)
 
-input_M3 <- as.data.frame(segment_12_01_02_inf_12500)
+input_M3 <- as.data.frame(segment_12_01_02_inf_5000)
 wssplot <- function(data, nc=15, seed=123){
   wss <- (nrow(data)-1)*sum(apply(data,2,var))
   for (i in 2:nc){
@@ -1123,7 +1124,7 @@ aggregate(input_M3,by=list(clustering_M3$cluster),FUN=sd)
 ## Kmeans Alorythm details segment_12_01_02_sup_12500
 set.seed(123)
 
-input_M3 <- as.data.frame(segment_12_01_02_sup_12500)
+input_M3 <- as.data.frame(segment_12_01_02_sup_5000)
 wssplot <- function(data, nc=15, seed=123){
   wss <- (nrow(data)-1)*sum(apply(data,2,var))
   for (i in 2:nc){
@@ -1144,32 +1145,262 @@ aggregate(input_M3,by=list(clustering_M3$cluster),FUN=sd)
 ```
 
 ```{r}
-## apply results of K means in the Raw data
 
+## segment limit
+min_0 <- 0
+Min_1 <- 740
+Min_2 <- 1369
+Min_3 <- 2223
+Min_4 <- 3399
+Min_5 <- 5000
+Min_6 <-7062
+Min_7 <- 9846
+Min_8 <-13927
+        
+
+## apply results of K means in the Raw data
+df_month_3
 is.num <- sapply(df_month_3, is.numeric)
 df_month_3[is.num] <- lapply(df_month_3[is.num], round, 0)
+glimpse(df_month_3)
 
 
-df_month_5 <- df_month_3 %>% mutate(segment_value=ifelse( df_month_3[is.num] == 0 ,"Inactive",ifelse( df_month_3[is.num]>0 & df_month_3[is.num]<  2000,"very_low",ifelse(df_month_3[is.num]>= 2000 & df_month_3[is.num] <  3500,"low",ifelse(df_month_3[is.num]>= 3500 & df_month_3[is.num] <  5500, "mid",ifelse(df_month_3[is.num]>= 5500 & n_seg_1 <8500, "high",ifelse(df_month_3[is.num]>= 8500 & df_month_3[is.num] <=  12000,"very_high","Extra_very_high"))))))) 
+#### 1
+day1 <- '2017-08-31'
+day2 <- '2017-01-01' 
 
-df_month_4 <- df_month_5 %>% dplyr::select(-(segment_value))
-df_month_6 <-as.data.frame(df_month_5$segment_value) %>% dplyr::select(starts_with("n"))
-colnames(df_month_6) [1:41] = paste("value","_", colnames(df_month_6)) [1:41]
+df_month_5_1 <- df_month_3  %>%  mutate(flag_login_1= ifelse((Creation_Date <= '2017-08-31' & Creation_Date >= '2017-01-01') & (first_trip_date <= '2017-08-31' & first_trip_date >= '2017-01-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-01-01') & (first_trip_date <= '2017-08-31' & first_trip_date >= '2017-01-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2017-08-31' & first_trip_date > '2017-08-31'),"",'BASE'))),segment_value_n_seg_1=ifelse( n_seg_1 <= 0 ,"Inactive",ifelse( n_seg_1> min_0 & n_seg_1<  Min_1,"very_low",ifelse(n_seg_1>= Min_1 & n_seg_1 <  Min_2,"low",ifelse(n_seg_1>= Min_2 & n_seg_1<  Min_3, "mid",ifelse(n_seg_1>= Min_3 & n_seg_1 <Min_4, "high",ifelse(n_seg_1>= Min_4 & n_seg_1 <  Min_5,"very_high",ifelse(n_seg_1>= Min_5 & n_seg_1 <  Min_6,"Extra_low",ifelse(n_seg_1>= Min_6 & n_seg_1 <  Min_7,"Extra_Mid",ifelse(n_seg_1>= Min_7 & n_seg_1 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_1 = ifelse(flag_login_1=="","", paste(flag_login_1,segment_value_n_seg_1,sep = '_')))
 
-df_month_7 <- cbind(df_month_4, df_month_6)
+
+#### 2
+day1 <- '2017-09-30'
+day2 <- '2017-07-01' 
+seg <- 'n_seg_2'
+df_month_5_2 <- df_month_5_1  %>%  mutate(flag_login_2= ifelse((Creation_Date <= '2017-09-30' & Creation_Date >= '2017-07-01') & (first_trip_date <= '2017-09-30' & first_trip_date >= '2017-07-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-07-01') & (first_trip_date <= '2017-09-30' & first_trip_date >= '2017-07-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2017-09-30' & first_trip_date > '2017-09-30'),"",'BASE'))),segment_value_n_seg_2=ifelse( n_seg_2 <= 0 ,"Inactive",ifelse( n_seg_2> min_0 & n_seg_2<  Min_1,"very_low",ifelse(n_seg_2>= Min_1 & n_seg_2 <  Min_2,"low",ifelse(n_seg_2>= Min_2 & n_seg_2<  Min_3, "mid",ifelse(n_seg_2>= Min_3 & n_seg_2 <Min_4, "high",ifelse(n_seg_2>= Min_4 & n_seg_2 <  Min_5,"very_high",ifelse(n_seg_2>= Min_5 & n_seg_2 <  Min_6,"Extra_low",ifelse(n_seg_2>= Min_6 & n_seg_2 <  Min_7,"Extra_Mid",ifelse(n_seg_2>= Min_7 & n_seg_2 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_2 = ifelse(flag_login_2=="","", paste(flag_login_2,segment_value_n_seg_2,sep = '_')))
+#### 3
+day1 <- '2017-10-31'
+day2 <- '2017-08-01' 
+seg <- 'n_seg_3'
+df_month_5_3 <- df_month_5_2 %>%  mutate(flag_login_3= ifelse((Creation_Date <= '2017-10-31' & Creation_Date >= '2017-08-01') & (first_trip_date <= '2017-10-31' & first_trip_date >= '2017-08-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-08-01') & (first_trip_date <= '2017-10-31' & first_trip_date >= '2017-10-31' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-11-30' & first_trip_date > '2017-10-31'),"",'BASE'))),segment_value_n_seg_3=ifelse( n_seg_3 <= 0 ,"Inactive",ifelse( n_seg_3> min_0 & n_seg_3<  Min_1,"very_low",ifelse(n_seg_3>= Min_1 & n_seg_3 <  Min_2,"low",ifelse(n_seg_3>= Min_2 & n_seg_3<  Min_3, "mid",ifelse(n_seg_3>= Min_3 & n_seg_3 <Min_4, "high",ifelse(n_seg_1>= Min_4 & n_seg_1 <  Min_5,"very_high",ifelse(n_seg_3>= Min_5 & n_seg_3 <  Min_6,"Extra_low",ifelse(n_seg_3>= Min_6 & n_seg_3 <  Min_7,"Extra_Mid",ifelse(n_seg_3>= Min_7 & n_seg_3 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_3 = ifelse(flag_login_3=="","", paste(flag_login_3,segment_value_n_seg_3,sep = '_')))
+#### 4
+day1 <- '2017-11-30'
+day2 <- '2017-09-01' 
+seg <- n_seg_4
+df_month_5_4 <- df_month_5_3  %>%  mutate(flag_login_4= ifelse((Creation_Date <= '2017-11-30' & Creation_Date >= '2017-09-01') & (first_trip_date <= '2017-11-30' & first_trip_date >= '2017-09-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-09-01') & (first_trip_date <= '2017-11-30' & first_trip_date >= '2017-09-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2017-11-30' & first_trip_date > '2017-11-30'),"",'BASE'))),segment_value_n_seg_4=ifelse( n_seg_4 <= 0 ,"Inactive",ifelse( n_seg_4> min_0 & n_seg_1<  Min_1,"very_low",ifelse(n_seg_4>= Min_1 & n_seg_4 <  Min_2,"low",ifelse(n_seg_4>= Min_2 & n_seg_4<  Min_3, "mid",ifelse(n_seg_4>= Min_3 & n_seg_4 <Min_4, "high",ifelse(n_seg_4>= Min_4 & n_seg_4 <  Min_5,"very_high",ifelse(n_seg_4>= Min_5 & n_seg_4 <  Min_6,"Extra_low",ifelse(n_seg_4>= Min_6 & n_seg_4 <  Min_7,"Extra_Mid",ifelse(n_seg_4>= Min_7 & n_seg_4 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_4 = ifelse(flag_login_4=="","", paste(flag_login_4,segment_value_n_seg_4,sep = '_')))
+#### 5
+day1 <- '2017-12-31'
+day2 <- '2017-10-01' 
+seg <- n_seg_5
+df_month_5_5 <- df_month_5_4  %>%  mutate(flag_login_5= ifelse((Creation_Date <= '2017-12-31' & Creation_Date >= '2017-10-01') & (first_trip_date <= '2017-12-31' & first_trip_date >= '2017-10-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-10-01') & (first_trip_date <= '2017-12-31' & first_trip_date >= '2017-10-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2017-12-31'& first_trip_date > '2017-12-31'),"",'BASE'))),segment_value_n_seg_5=ifelse( n_seg_5 <= 0 ,"Inactive",ifelse( n_seg_5> min_0 & n_seg_5<  Min_1,"very_low",ifelse(n_seg_5>= Min_1 & n_seg_5 <  Min_2,"low",ifelse(n_seg_5>= Min_2 & n_seg_5<  Min_3, "mid",ifelse(n_seg_5>= Min_3 & n_seg_5 <Min_4, "high",ifelse(n_seg_5>= Min_4 & n_seg_5 <  Min_5,"very_high",ifelse(n_seg_5>= Min_5 & n_seg_5 <  Min_6,"Extra_low",ifelse(n_seg_5>= Min_6 & n_seg_5 <  Min_7,"Extra_Mid",ifelse(n_seg_5>= Min_7 & n_seg_5 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_5 = ifelse(flag_login_5=="","", paste(flag_login_5,segment_value_n_seg_5,sep = '_')))
+#### 6
+day1 <- '2018-01-31'
+day2 <- '2017-11-01' 
+seg <- n_seg_6
+df_month_5_6 <- df_month_5_5  %>%  mutate(flag_login_6= ifelse((Creation_Date <= '2018-01-31' & Creation_Date >= '2017-11-01') & (first_trip_date <= '2018-01-31' & first_trip_date >= '2017-11-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-11-01') & (first_trip_date <= '2018-01-31' & first_trip_date >= '2017-11-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-01-31' & first_trip_date > '2018-01-31'),"",'BASE'))),segment_value_n_seg_6=ifelse( n_seg_6 <= 0 ,"Inactive",ifelse( n_seg_6> min_0 & n_seg_6<  Min_1,"very_low",ifelse(n_seg_6>= Min_1 & n_seg_6 <  Min_2,"low",ifelse(n_seg_6>= Min_2 & n_seg_6<  Min_3, "mid",ifelse(n_seg_6>= Min_3 & n_seg_6 <Min_4, "high",ifelse(n_seg_6>= Min_4 & n_seg_6 <  Min_5,"very_high",ifelse(n_seg_6>= Min_5 & n_seg_6 <  Min_6,"Extra_low",ifelse(n_seg_6>= Min_6 & n_seg_6 <  Min_7,"Extra_Mid",ifelse(n_seg_6>= Min_7 & n_seg_6 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_6 = ifelse(flag_login_6=="","", paste(flag_login_6,segment_value_n_seg_6,sep = '_')))
+#### 7
+day1 <- '2018-02-28'
+day2 <- '2017-12-01' 
+seg <- n_seg_7
+df_month_5_7 <- df_month_5_6  %>%  mutate(flag_login_7= ifelse((Creation_Date <= '2018-02-28' & Creation_Date >= '2017-12-01') & (first_trip_date <= '2018-02-28' & first_trip_date >= '2017-12-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-12-01') & (first_trip_date <= '2018-02-28' & first_trip_date >= '2017-12-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-02-28' & first_trip_date > '2018-02-28'),"",'BASE'))),segment_value_n_seg_7=ifelse( n_seg_7 <= 0 ,"Inactive",ifelse( n_seg_7> min_0 & n_seg_7<  Min_1,"very_low",ifelse(n_seg_7>= Min_1 & n_seg_7 <  Min_2,"low",ifelse(n_seg_7>= Min_2 & n_seg_7<  Min_3, "mid",ifelse(n_seg_7>= Min_3 & n_seg_7 <Min_4, "high",ifelse(n_seg_7>= Min_4 & n_seg_7 <  Min_5,"very_high",ifelse(n_seg_7>= Min_5 & n_seg_7 <  Min_6,"Extra_low",ifelse(n_seg_7>= Min_6 & n_seg_7 <  Min_7,"Extra_Mid",ifelse(n_seg_7>= Min_7 & n_seg_7 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_7 = ifelse(flag_login_7=="","", paste(flag_login_7,segment_value_n_seg_7,sep = '_')))
+#### 8
+day1 <- '2018-03-31'
+day2 <- '2018-01-01' 
+seg <- n_seg_8
+df_month_5_8 <- df_month_5_7  %>%  mutate(flag_login_8= ifelse((Creation_Date <= '2018-03-31' & Creation_Date >= '2018-01-01') & (first_trip_date <= '2018-03-31'& first_trip_date >= '2018-01-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-01-01') & (first_trip_date <= '2018-03-31' & first_trip_date >= '2018-01-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-03-31' & first_trip_date > '2018-03-31'),"",'BASE'))),segment_value_n_seg_8=ifelse( n_seg_8 <= 0 ,"Inactive",ifelse( n_seg_8> min_0 & n_seg_8<  Min_1,"very_low",ifelse(n_seg_8>= Min_1 & n_seg_8 <  Min_2,"low",ifelse(n_seg_8>= Min_2 & n_seg_8<  Min_3, "mid",ifelse(n_seg_8>= Min_3 & n_seg_8 <Min_4, "high",ifelse(n_seg_8>= Min_4 & n_seg_8 <  Min_5,"very_high",ifelse(n_seg_8>= Min_5 & n_seg_8 <  Min_6,"Extra_low",ifelse(n_seg_8>= Min_6 & n_seg_8 <  Min_7,"Extra_Mid",ifelse(n_seg_8>= Min_7 & n_seg_8 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_8 = ifelse(flag_login_8=="","", paste(flag_login_8,segment_value_n_seg_8,sep = '_')))
+#### 9
+day1 <- '2018-04-30'
+day2 <- '2018-02-01' 
+seg <- n_seg_9
+df_month_5_9 <- df_month_5_8  %>%  mutate(flag_login_9= ifelse((Creation_Date <= '2018-04-30' & Creation_Date >= '2018-02-01') & (first_trip_date <= '2018-04-30'& first_trip_date >='2018-02-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-02-01') & (first_trip_date <= '2018-04-30' & first_trip_date >= '2018-02-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-04-30' & first_trip_date > '2018-04-30'),"",'BASE'))),segment_value_n_seg_9=ifelse( n_seg_9 <= 0 ,"Inactive",ifelse( n_seg_9> min_0 & n_seg_9<  Min_1,"very_low",ifelse(n_seg_9>= Min_1 & n_seg_9 <  Min_2,"low",ifelse(n_seg_9>= Min_2 & n_seg_9<  Min_3, "mid",ifelse(n_seg_9>= Min_3 & n_seg_9 <Min_4, "high",ifelse(n_seg_9>= Min_4 & n_seg_9 <  Min_5,"very_high",ifelse(n_seg_9>= Min_5 & n_seg_9 <  Min_6,"Extra_low",ifelse(n_seg_9>= Min_6 & n_seg_9 <  Min_7,"Extra_Mid",ifelse(n_seg_9>= Min_7 & n_seg_9 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_9 = ifelse(flag_login_9=="","", paste(flag_login_9,segment_value_n_seg_9,sep = '_')))
+#### 10
+day1 <- '2018-05-31'
+day2 <- '2018-03-01' 
+
+df_month_5_10 <- df_month_5_9  %>%  mutate(flag_login_10= ifelse((Creation_Date <= '2018-05-31' & Creation_Date >= '2018-03-01') & (first_trip_date <=  '2018-05-31' & first_trip_date >='2018-03-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-03-01') & (first_trip_date <= '2018-05-31' & first_trip_date >= '2018-03-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-05-31' & first_trip_date > '2018-05-31'),"",'BASE'))),segment_value_n_seg_10=ifelse( n_seg_10 <= 0 ,"Inactive",ifelse( n_seg_10> min_0 & n_seg_10<  Min_1,"very_low",ifelse(n_seg_10>= Min_1 & n_seg_10 <  Min_2,"low",ifelse(n_seg_10>= Min_2 & n_seg_10<  Min_3, "mid",ifelse(n_seg_10>= Min_3 & n_seg_10 <Min_4, "high",ifelse(n_seg_10>= Min_4 & n_seg_10 <  Min_5,"very_high",ifelse(n_seg_10>= Min_5 & n_seg_10 <  Min_6,"Extra_low",ifelse(n_seg_10>= Min_6 & n_seg_10 <  Min_7,"Extra_Mid",ifelse(n_seg_10>= Min_7 & n_seg_10 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_10 = ifelse(flag_login_10=="","", paste(flag_login_10,segment_value_n_seg_10,sep = '_')))
+#### 11
+day1 <- '2018-06-30'
+day2 <- '2018-04-01' 
+seg <- n_seg_11
+df_month_5_11 <- df_month_5_10  %>%  mutate(flag_login_11= ifelse((Creation_Date <= '2018-06-30' & Creation_Date >= '2018-04-01') & (first_trip_date <=  '2018-06-30' & first_trip_date >='2018-04-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-04-01') & (first_trip_date <= '2018-06-30' & first_trip_date >= '2018-04-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-06-30' & first_trip_date > '2018-06-30'),"",'BASE'))),segment_value_n_seg_11=ifelse( n_seg_11 <= 0 ,"Inactive",ifelse( n_seg_11> min_0 & n_seg_11<  Min_1,"very_low",ifelse(n_seg_11>= Min_1 & n_seg_11 <  Min_2,"low",ifelse(n_seg_11>= Min_2 & n_seg_11<  Min_3, "mid",ifelse(n_seg_11>= Min_3 & n_seg_11 <Min_4, "high",ifelse(n_seg_11>= Min_4 & n_seg_11 <  Min_5,"very_high",ifelse(n_seg_11>= Min_5 & n_seg_11 <  Min_6,"Extra_low",ifelse(n_seg_11>= Min_6 & n_seg_11 <  Min_7,"Extra_Mid",ifelse(n_seg_11>= Min_7 & n_seg_11 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_11 = ifelse(flag_login_11=="","", paste(flag_login_11,segment_value_n_seg_11,sep = '_')))
+#### 12
+day1 <- '2018-07-31'
+day2 <- '2018-05-01' 
+seg <- n_seg_12
+df_month_5_12 <- df_month_5_11  %>%  mutate(flag_login_12= ifelse((Creation_Date <= '2018-07-31' & Creation_Date >= '2018-05-01') & (first_trip_date <=  '2018-07-31' & first_trip_date >='2018-05-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-05-01') & (first_trip_date <= '2018-07-31' & first_trip_date >= '2018-05-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-07-31' & first_trip_date > '2018-07-31'),"",'BASE'))),segment_value_n_seg_12=ifelse( n_seg_12 <= 0 ,"Inactive",ifelse( n_seg_12> min_0 & n_seg_12<  Min_1,"very_low",ifelse(n_seg_12>= Min_1 & n_seg_12 <  Min_2,"low",ifelse(n_seg_12>= Min_2 & n_seg_12<  Min_3, "mid",ifelse(n_seg_12>= Min_3 & n_seg_12 <Min_4, "high",ifelse(n_seg_12>= Min_4 & n_seg_12 <  Min_5,"very_high",ifelse(n_seg_12>= Min_5 & n_seg_12 <  Min_6,"Extra_low",ifelse(n_seg_12>= Min_6 & n_seg_12 <  Min_7,"Extra_Mid",ifelse(n_seg_12>= Min_7 & n_seg_12 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_12 = ifelse(flag_login_12=="","", paste(flag_login_12,segment_value_n_seg_12,sep = '_')))
+#### 13
+day1 <- '2018-08-31'
+day2 <- '2018-06-01' 
+seg <- n_seg_13
+df_month_5_13 <- df_month_5_12  %>%  mutate(flag_login_13= ifelse((Creation_Date <='2018-08-31' & Creation_Date >= '2018-06-01') & (first_trip_date <=  '2018-08-31' & first_trip_date >='2018-06-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-06-01') & (first_trip_date <= '2018-08-31' & first_trip_date >= '2018-06-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-08-31' & first_trip_date > '2018-08-31'),"",'BASE'))),segment_value_n_seg_13=ifelse( n_seg_13 <= 0 ,"Inactive",ifelse( n_seg_13> min_0 & n_seg_13<  Min_1,"very_low",ifelse(n_seg_13>= Min_1 & n_seg_13 <  Min_2,"low",ifelse(n_seg_13>= Min_2 & n_seg_13<  Min_3, "mid",ifelse(n_seg_13>= Min_3 & n_seg_13 <Min_4, "high",ifelse(n_seg_13>= Min_4 & n_seg_13 <  Min_5,"very_high",ifelse(n_seg_13>= Min_5 & n_seg_13 <  Min_6,"Extra_low",ifelse(n_seg_13>= Min_6 & n_seg_13 <  Min_7,"Extra_Mid",ifelse(n_seg_13>= Min_7 & n_seg_13 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_13 = ifelse(flag_login_13=="","", paste(flag_login_13,segment_value_n_seg_13,sep = '_')))
+#### 14
+day1 <- '2018-09-30'
+day2 <- '2018-07-01' 
+seg <- n_seg_14
+df_month_5_14 <- df_month_5_13  %>%  mutate(flag_login_14= ifelse((Creation_Date <='2018-09-30' & Creation_Date >= '2018-07-01') & (first_trip_date <=  '2018-09-30' & first_trip_date >='2018-07-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-07-01') & (first_trip_date <= '2018-09-30' & first_trip_date >= '2018-07-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-09-30' & first_trip_date > '2018-09-30'),"",'BASE'))),segment_value_n_seg_14=ifelse( n_seg_14 <= 0 ,"Inactive",ifelse( n_seg_14> min_0 & n_seg_14<  Min_1,"very_low",ifelse(n_seg_14>= Min_1 & n_seg_14 <  Min_2,"low",ifelse(n_seg_14>= Min_2 & n_seg_14<  Min_3, "mid",ifelse(n_seg_14>= Min_3 & n_seg_14 <Min_4, "high",ifelse(n_seg_14>= Min_4 & n_seg_14 <  Min_5,"very_high",ifelse(n_seg_14>= Min_5 & n_seg_14 <  Min_6,"Extra_low",ifelse(n_seg_14>= Min_6 & n_seg_14 <  Min_7,"Extra_Mid",ifelse(n_seg_14>= Min_7 & n_seg_14 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_14 = ifelse(flag_login_14=="","", paste(flag_login_14,segment_value_n_seg_14,sep = '_')))
+#### 15
+day1 <- '2018-10-31'
+day2 <- '2018-08-01' 
+seg <- n_seg_15
+df_month_5_15 <- df_month_5_14  %>%  mutate(flag_login_15= ifelse((Creation_Date <='2018-10-31' & Creation_Date >= '2018-08-01') & (first_trip_date <=  '2018-10-31' & first_trip_date >='2018-08-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-08-01') & (first_trip_date <= '2018-10-31' & first_trip_date >= '2018-08-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-10-31' & first_trip_date > '2018-10-31'),"",'BASE'))),segment_value_n_seg_15=ifelse( n_seg_15 <= 0 ,"Inactive",ifelse( n_seg_15> min_0 & n_seg_15<  Min_1,"very_low",ifelse(n_seg_15>= Min_1 & n_seg_15 <  Min_2,"low",ifelse(n_seg_15>= Min_2 & n_seg_15<  Min_3, "mid",ifelse(n_seg_15>= Min_3 & n_seg_15 <Min_4, "high",ifelse(n_seg_15>= Min_4 & n_seg_15 <  Min_5,"very_high",ifelse(n_seg_15>= Min_5 & n_seg_15 <  Min_6,"Extra_low",ifelse(n_seg_15>= Min_6 & n_seg_15 <  Min_7,"Extra_Mid",ifelse(n_seg_15>= Min_7 & n_seg_15 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_15 = ifelse(flag_login_15=="","", paste(flag_login_15,segment_value_n_seg_15,sep = '_')))
+#### 16
+day1 <- '2018-11-30'
+day2 <- '2018-09-01' 
+seg <- n_seg_16
+df_month_5_16 <- df_month_5_15  %>%  mutate(flag_login_16= ifelse((Creation_Date <='2018-11-30' & Creation_Date >= '2018-09-01') & (first_trip_date <=  '2018-11-30' & first_trip_date >='2018-09-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-09-01') & (first_trip_date <= '2018-11-30' & first_trip_date >= '2018-09-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-11-30' & first_trip_date > '2018-11-30'),"",'BASE'))),segment_value_n_seg_16=ifelse( n_seg_16 <= 0 ,"Inactive",ifelse( n_seg_16> min_0 & n_seg_16<  Min_1,"very_low",ifelse(n_seg_16>= Min_1 & n_seg_16 <  Min_2,"low",ifelse(n_seg_16>= Min_2 & n_seg_16<  Min_3, "mid",ifelse(n_seg_16>= Min_3 & n_seg_16 <Min_4, "high",ifelse(n_seg_16>= Min_4 & n_seg_16 <  Min_5,"very_high",ifelse(n_seg_16>= Min_5 & n_seg_16 <  Min_6,"Extra_low",ifelse(n_seg_16>= Min_6 & n_seg_16 <  Min_7,"Extra_Mid",ifelse(n_seg_16>= Min_7 & n_seg_16 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_16 = ifelse(flag_login_16=="","", paste(flag_login_16,segment_value_n_seg_16,sep = '_')))
+#### 17
+day1 <- '2018-12-31'
+day2 <- '2018-10-01' 
+seg <- n_seg_17
+df_month_5_17 <- df_month_5_16  %>%  mutate(flag_login_17= ifelse((Creation_Date <='2018-12-31' & Creation_Date >= '2018-10-01') & (first_trip_date <=  '2018-12-31' & first_trip_date >='2018-10-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-10-01') & (first_trip_date <= '2018-12-31' & first_trip_date >= '2018-10-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-12-31' & first_trip_date > '2018-12-31'),"",'BASE'))),segment_value_n_seg_17=ifelse( n_seg_17 <= 0 ,"Inactive",ifelse( n_seg_17> min_0 & n_seg_17<  Min_1,"very_low",ifelse(n_seg_17>= Min_1 & n_seg_17 <  Min_2,"low",ifelse(n_seg_17>= Min_2 & n_seg_17<  Min_3, "mid",ifelse(n_seg_17>= Min_3 & n_seg_17 <Min_4, "high",ifelse(n_seg_17>= Min_4 & n_seg_17 <  Min_5,"very_high",ifelse(n_seg_17>= Min_5 & n_seg_17 <  Min_6,"Extra_low",ifelse(n_seg_17>= Min_6 & n_seg_17 <  Min_7,"Extra_Mid",ifelse(n_seg_17>= Min_7 & n_seg_17 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_17 = ifelse(flag_login_17=="","", paste(flag_login_17,segment_value_n_seg_17,sep = '_')))
+#### 18
+day1 <- '2019-01-31'
+day2 <- '2018-11-01' 
+seg <- n_seg_18
+df_month_5_18 <- df_month_5_17  %>%  mutate(flag_login_18= ifelse((Creation_Date <= '2019-01-31' & Creation_Date >='2018-11-01' ) & (first_trip_date <=   '2019-01-31' & first_trip_date >='2018-11-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-11-01' ) & (first_trip_date <=  '2019-01-31' & first_trip_date >= '2018-11-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-01-31' & first_trip_date > '2019-01-31'),"",'BASE'))),segment_value_n_seg_18=ifelse( n_seg_18 <= 0 ,"Inactive",ifelse( n_seg_18> min_0 & n_seg_18<  Min_1,"very_low",ifelse(n_seg_18>= Min_1 & n_seg_18 <  Min_2,"low",ifelse(n_seg_18>= Min_2 & n_seg_10<  Min_3, "mid",ifelse(n_seg_18>= Min_3 & n_seg_18 <Min_4, "high",ifelse(n_seg_18>= Min_4 & n_seg_18 <  Min_5,"very_high",ifelse(n_seg_18>= Min_5 & n_seg_18 <  Min_6,"Extra_low",ifelse(n_seg_18>= Min_6 & n_seg_18 <  Min_7,"Extra_Mid",ifelse(n_seg_18>= Min_7 & n_seg_18 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_18 = ifelse(flag_login_18=="","", paste(flag_login_18,segment_value_n_seg_18,sep = '_')))
+#### 19
+day1 <- '2019-02-28'
+day2 <- '2018-12-01' 
+seg <- n_seg_19
+df_month_5_19 <- df_month_5_18  %>%  mutate(flag_login_19= ifelse((Creation_Date <= '2019-02-28' & Creation_Date >='2018-12-01' ) & (first_trip_date <=   '2019-02-28' & first_trip_date >='2018-12-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-12-01' ) & (first_trip_date <=  '2019-02-28' & first_trip_date >= '2018-12-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-02-28' & first_trip_date > '2019-02-28'),"",'BASE'))),segment_value_n_seg_19=ifelse( n_seg_19 <= 0 ,"Inactive",ifelse( n_seg_19> min_0 & n_seg_19<  Min_1,"very_low",ifelse(n_seg_19>= Min_1 & n_seg_19 <  Min_2,"low",ifelse(n_seg_19>= Min_2 & n_seg_19<  Min_3, "mid",ifelse(n_seg_19>= Min_3 & n_seg_19 <Min_4, "high",ifelse(n_seg_19>= Min_4 & n_seg_19 <  Min_5,"very_high",ifelse(n_seg_19>= Min_5 & n_seg_19 <  Min_6,"Extra_low",ifelse(n_seg_19>= Min_6 & n_seg_19 <  Min_7,"Extra_Mid",ifelse(n_seg_19>= Min_7 & n_seg_19 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_19 = ifelse(flag_login_19=="","", paste(flag_login_19,segment_value_n_seg_19,sep = '_')))
+#### 20
+day1 <- '2019-03-31'
+day2 <- '2019-01-01' 
+seg <- n_seg_20
+df_month_5_20 <- df_month_5_19 %>%  mutate(flag_login_20= ifelse((Creation_Date <= '2019-03-31' & Creation_Date >='2019-01-01'  ) & (first_trip_date <=   '2019-03-31' & first_trip_date >='2019-01-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-01-01'  ) & (first_trip_date <=  '2019-03-31' & first_trip_date >= '2019-01-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-03-31' & first_trip_date > '2019-03-31'),"",'BASE'))),segment_value_n_seg_20=ifelse( n_seg_20 <= 0 ,"Inactive",ifelse( n_seg_20> min_0 & n_seg_20<  Min_1,"very_low",ifelse(n_seg_20>= Min_1 & n_seg_20 <  Min_2,"low",ifelse(n_seg_20>= Min_2 & n_seg_20<  Min_3, "mid",ifelse(n_seg_20>= Min_3 & n_seg_20 <Min_4, "high",ifelse(n_seg_20>= Min_4 & n_seg_20 <  Min_5,"very_high",ifelse(n_seg_20>= Min_5 & n_seg_20 <  Min_6,"Extra_low",ifelse(n_seg_20>= Min_6 & n_seg_20 <  Min_7,"Extra_Mid",ifelse(n_seg_20>= Min_7 & n_seg_20 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_20 = ifelse(flag_login_20=="","", paste(flag_login_20,segment_value_n_seg_20,sep = '_')))
+#### 21
+day1 <- '2019-04-30'
+day2 <- '2019-02-01' 
+seg <- n_seg_21
+df_month_5_21 <- df_month_5_20  %>%  mutate(flag_login_21= ifelse((Creation_Date <= '2019-04-30' & Creation_Date >= '2019-02-01'  ) & (first_trip_date <=   '2019-04-30' & first_trip_date >='2019-02-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-02-01'  ) & (first_trip_date <=  '2019-04-30' & first_trip_date >= '2019-02-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-04-30' & first_trip_date > '2019-04-30'),"",'BASE'))),segment_value_n_seg_21=ifelse( n_seg_21 <= 0 ,"Inactive",ifelse( n_seg_21> min_0 & n_seg_21<  Min_1,"very_low",ifelse(n_seg_21>= Min_1 & n_seg_21 <  Min_2,"low",ifelse(n_seg_21>= Min_2 & n_seg_21<  Min_3, "mid",ifelse(n_seg_21>= Min_3 & n_seg_21 <Min_4, "high",ifelse(n_seg_21>= Min_4 & n_seg_21 <  Min_5,"very_high",ifelse(n_seg_21>= Min_5 & n_seg_21 <  Min_6,"Extra_low",ifelse(n_seg_21>= Min_6 & n_seg_21 <  Min_7,"Extra_Mid",ifelse(n_seg_21>= Min_7 & n_seg_21 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_21 = ifelse(flag_login_21=="","", paste(flag_login_21,segment_value_n_seg_21,sep = '_')))
+#### 22
+day1 <- '2019-05-31'
+day2 <- '2019-03-01' 
+seg <- n_seg_22
+df_month_5_22 <- df_month_5_21  %>%  mutate(flag_login_22= ifelse((Creation_Date <= '2019-05-31' & Creation_Date >= '2019-03-01'  ) & (first_trip_date <= '2019-05-31' & first_trip_date >='2019-03-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <='2019-03-01'  ) & (first_trip_date <=  '2019-05-31' & first_trip_date >= '2019-03-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-05-31' & first_trip_date > '2019-05-31'),"",'BASE'))),segment_value_n_seg_22=ifelse( n_seg_22 <= 0 ,"Inactive",ifelse( n_seg_22> min_0 & n_seg_22<  Min_1,"very_low",ifelse(n_seg_22>= Min_1 & n_seg_22 <  Min_2,"low",ifelse(n_seg_22>= Min_2 & n_seg_22<  Min_3, "mid",ifelse(n_seg_22>= Min_3 & n_seg_22 <Min_4, "high",ifelse(n_seg_22>= Min_4 & n_seg_22 <  Min_5,"very_high",ifelse(n_seg_22>= Min_5 & n_seg_22 <  Min_6,"Extra_low",ifelse(n_seg_22>= Min_6 & n_seg_22 <  Min_7,"Extra_Mid",ifelse(n_seg_22>= Min_7 & n_seg_22 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_22 = ifelse(flag_login_22=="","", paste(flag_login_22,segment_value_n_seg_22,sep = '_')))
+#### 23
+day1 <- '2019-06-30'
+day2 <- '2019-04-01' 
+seg <- n_seg_23
+df_month_5_23 <- df_month_5_22  %>%  mutate(flag_login_23= ifelse((Creation_Date <= '2019-06-30' & Creation_Date >=  '2019-04-01'  ) & (first_trip_date <= '2019-06-30' & first_trip_date >= '2019-04-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-04-01'  ) & (first_trip_date <=  '2019-06-30' & first_trip_date >=  '2019-04-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-06-30' & first_trip_date > '2019-06-30'),"",'BASE'))),segment_value_n_seg_23=ifelse( n_seg_23 <= 0 ,"Inactive",ifelse( n_seg_23> min_0 & n_seg_23<  Min_1,"very_low",ifelse(n_seg_23>= Min_1 & n_seg_23 <  Min_2,"low",ifelse(n_seg_23>= Min_2 & n_seg_23<  Min_3, "mid",ifelse(n_seg_23>= Min_3 & n_seg_23 <Min_4, "high",ifelse(n_seg_23>= Min_4 & n_seg_23 <  Min_5,"very_high",ifelse(n_seg_23>= Min_5 & n_seg_23 <  Min_6,"Extra_low",ifelse(n_seg_23>= Min_6 & n_seg_23 <  Min_7,"Extra_Mid",ifelse(n_seg_23>= Min_7 & n_seg_23 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_23 = ifelse(flag_login_23=="","", paste(flag_login_23,segment_value_n_seg_23,sep = '_')))
+#### 24
+day1 <- '2019-07-31'
+day2 <- '2019-05-01' 
+seg <- n_seg_24
+df_month_5_24 <- df_month_5_23 %>%  mutate(flag_login_24= ifelse((Creation_Date <= '2019-07-31' & Creation_Date >=  '2019-05-01'  ) & (first_trip_date <=  '2019-07-31' & first_trip_date >= '2019-05-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-05-01'  ) & (first_trip_date <=   '2019-07-31' & first_trip_date >= '2019-05-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-07-31' & first_trip_date > '2019-07-31'),"",'BASE'))),segment_value_n_seg_24=ifelse( n_seg_24 <= 0 ,"Inactive",ifelse( n_seg_24> min_0 & n_seg_24<  Min_1,"very_low",ifelse(n_seg_24>= Min_1 & n_seg_24 <  Min_2,"low",ifelse(n_seg_24>= Min_2 & n_seg_24<  Min_3, "mid",ifelse(n_seg_24>= Min_3 & n_seg_24 <Min_4, "high",ifelse(n_seg_24>= Min_4 & n_seg_24 <  Min_5,"very_high",ifelse(n_seg_24>= Min_5 & n_seg_24 <  Min_6,"Extra_low",ifelse(n_seg_24>= Min_6 & n_seg_24 <  Min_7,"Extra_Mid",ifelse(n_seg_24>= Min_7 & n_seg_24 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_24 = ifelse(flag_login_24=="","", paste(flag_login_24,segment_value_n_seg_24,sep = '_')))
+#### 25
+day1 <- '2019-08-31'
+day2 <- '2019-06-01' 
+seg <- n_seg_25
+df_month_5_25 <- df_month_5_24 %>%   mutate(flag_login_25= ifelse((Creation_Date <= '2019-08-31' & Creation_Date >= '2019-06-01'  ) & (first_trip_date <=  '2019-08-31' & first_trip_date >= '2019-06-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-06-01'  ) & (first_trip_date <=   '2019-08-31' & first_trip_date >= '2019-06-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-08-31' & first_trip_date > '2019-08-31'),"",'BASE'))),segment_value_n_seg_25=ifelse( n_seg_25 <= 0 ,"Inactive",ifelse( n_seg_25> min_0 & n_seg_25<  Min_1,"very_low",ifelse(n_seg_25>= Min_1 & n_seg_25 <  Min_2,"low",ifelse(n_seg_25>= Min_2 & n_seg_25<  Min_3, "mid",ifelse(n_seg_25>= Min_3 & n_seg_25 <Min_4, "high",ifelse(n_seg_25>= Min_4 & n_seg_25 <  Min_5,"very_high",ifelse(n_seg_25>= Min_5 & n_seg_25 <  Min_6,"Extra_low",ifelse(n_seg_25>= Min_6 & n_seg_25 <  Min_7,"Extra_Mid",ifelse(n_seg_25>= Min_7 & n_seg_25 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_25 = ifelse(flag_login_25=="","", paste(flag_login_25,segment_value_n_seg_25,sep = '_')))
+#### 26
+day1 <- '2019-09-30'
+day2 <- '2019-07-01' 
+seg <- n_seg_26
+df_month_5_26 <- df_month_5_25 %>%   mutate(flag_login_26= ifelse((Creation_Date <= '2019-09-30' & Creation_Date >= '2019-07-01'  ) & (first_trip_date <=  '2019-09-30' & first_trip_date >= '2019-07-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-07-01'  ) & (first_trip_date <=   '2019-09-30' & first_trip_date >= '2019-07-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-09-30' & first_trip_date > '2019-09-30'),"",'BASE'))),segment_value_n_seg_26=ifelse( n_seg_26 <= 0 ,"Inactive",ifelse( n_seg_26> min_0 & n_seg_26<  Min_1,"very_low",ifelse(n_seg_26>= Min_1 & n_seg_26 <  Min_2,"low",ifelse(n_seg_26>= Min_2 & n_seg_26<  Min_3, "mid",ifelse(n_seg_26>= Min_3 & n_seg_26 <Min_4, "high",ifelse(n_seg_26>= Min_4 & n_seg_26 <  Min_5,"very_high",ifelse(n_seg_26>= Min_5 & n_seg_26 <  Min_6,"Extra_low",ifelse(n_seg_26>= Min_6 & n_seg_26 <  Min_7,"Extra_Mid",ifelse(n_seg_26>= Min_7 & n_seg_26 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_26 = ifelse(flag_login_26=="","", paste(flag_login_26,segment_value_n_seg_26,sep = '_')))
+#### 27
+day1 <- '2019-10-31'
+day2 <- '2019-08-01' 
+seg <- n_seg_27
+df_month_5_27 <- df_month_5_26 %>%  mutate(flag_login_27= ifelse((Creation_Date <= '2019-10-31'& Creation_Date >= '2019-08-01'  ) & (first_trip_date <=  '2019-10-31'& first_trip_date >= '2019-08-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-08-01' ) & (first_trip_date <=   '2019-10-31' & first_trip_date >= '2019-08-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-10-31' & first_trip_date > '2019-10-31'),"",'BASE'))),segment_value_n_seg_27=ifelse( n_seg_27 <= 0 ,"Inactive",ifelse( n_seg_27> min_0 & n_seg_27<  Min_1,"very_low",ifelse(n_seg_27>= Min_1 & n_seg_27 <  Min_2,"low",ifelse(n_seg_27>= Min_2 & n_seg_27<  Min_3, "mid",ifelse(n_seg_27>= Min_3 & n_seg_27 <Min_4, "high",ifelse(n_seg_27>= Min_4 & n_seg_27 <  Min_5,"very_high",ifelse(n_seg_27>= Min_5 & n_seg_27 <  Min_6,"Extra_low",ifelse(n_seg_27>= Min_6 & n_seg_27 <  Min_7,"Extra_Mid",ifelse(n_seg_27>= Min_7 & n_seg_27 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_27 = ifelse(flag_login_27=="","", paste(flag_login_27,segment_value_n_seg_27,sep = '_')))
+#### 28
+day1 <- '2019-11-30'
+day2 <- '2019-09-01' 
+seg <- n_seg_28
+df_month_5_28 <- df_month_5_27 %>%  mutate(flag_login_28= ifelse((Creation_Date <= '2019-11-30'& Creation_Date >= '2019-09-01'  ) & (first_trip_date <=  '2019-11-30'& first_trip_date >= '2019-09-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-09-01' ) & (first_trip_date <=   '2019-11-30' & first_trip_date >='2019-09-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-11-30' & first_trip_date > '2019-11-30'),"",'BASE'))),segment_value_n_seg_28=ifelse( n_seg_28 <= 0 ,"Inactive",ifelse( n_seg_28> min_0 & n_seg_28<  Min_1,"very_low",ifelse(n_seg_28>= Min_1 & n_seg_28 <  Min_2,"low",ifelse(n_seg_28>= Min_2 & n_seg_28<  Min_3, "mid",ifelse(n_seg_28>= Min_3 & n_seg_28 <Min_4, "high",ifelse(n_seg_28>= Min_4 & n_seg_28 <  Min_5,"very_high",ifelse(n_seg_28>= Min_5 & n_seg_28 <  Min_6,"Extra_low",ifelse(n_seg_28>= Min_6 & n_seg_28 <  Min_7,"Extra_Mid",ifelse(n_seg_28>= Min_7 & n_seg_28 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_28 = ifelse(flag_login_28=="","", paste(flag_login_28,segment_value_n_seg_28,sep = '_')))
+#### 29
+day1 <- '2019-12-31'
+day2 <- '2019-10-01' 
+seg <- n_seg_29
+df_month_5_29 <- df_month_5_28 %>%   mutate(flag_login_29= ifelse((Creation_Date <= '2019-12-31'& Creation_Date >= '2019-10-01'   ) & (first_trip_date <=  '2019-12-31'& first_trip_date >= '2019-10-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-10-01' ) & (first_trip_date <=   '2019-12-31'& first_trip_date >='2019-10-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-12-31' & first_trip_date > '2019-12-31'),"",'BASE'))),segment_value_n_seg_29=ifelse( n_seg_29 <= 0 ,"Inactive",ifelse( n_seg_29> min_0 & n_seg_29<  Min_1,"very_low",ifelse(n_seg_29>= Min_1 & n_seg_29 <  Min_2,"low",ifelse(n_seg_29>= Min_2 & n_seg_29<  Min_3, "mid",ifelse(n_seg_29>= Min_3 & n_seg_29 <Min_4, "high",ifelse(n_seg_29>= Min_4 & n_seg_29 <  Min_5,"very_high",ifelse(n_seg_29>= Min_5 & n_seg_29 <  Min_6,"Extra_low",ifelse(n_seg_29>= Min_6 & n_seg_29 <  Min_7,"Extra_Mid",ifelse(n_seg_29>= Min_7 & n_seg_29 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_29 = ifelse(flag_login_29=="","", paste(flag_login_29,segment_value_n_seg_29,sep = '_')))
+#### 30
+day1 <- '2020-01-31'
+day2 <- '2019-11-01' 
+seg <- n_seg_30
+df_month_5_30 <- df_month_5_29 %>% mutate(flag_login_30= ifelse((Creation_Date <= '2020-01-31'& Creation_Date >='2019-11-01'    ) & (first_trip_date <= '2020-01-31'& first_trip_date >= '2019-11-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-11-01'  ) & (first_trip_date <=   '2020-01-31'& first_trip_date >='2019-11-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-01-31' & first_trip_date > '2020-01-31'),"",'BASE'))),segment_value_n_seg_30=ifelse( n_seg_30 <= 0 ,"Inactive",ifelse( n_seg_30> min_0 & n_seg_30<  Min_1,"very_low",ifelse(n_seg_30>= Min_1 & n_seg_30 <  Min_2,"low",ifelse(n_seg_30>= Min_2 & n_seg_30<  Min_3, "mid",ifelse(n_seg_30>= Min_3 & n_seg_30 <Min_4, "high",ifelse(n_seg_30>= Min_4 & n_seg_30 <  Min_5,"very_high",ifelse(n_seg_30>= Min_5 & n_seg_30 <  Min_6,"Extra_low",ifelse(n_seg_30>= Min_6 & n_seg_30 <  Min_7,"Extra_Mid",ifelse(n_seg_30>= Min_7 & n_seg_30 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_30 = ifelse(flag_login_30=="","", paste(flag_login_30,segment_value_n_seg_30,sep = '_')))
+#### 31
+day1 <- '2020-02-28'
+day2 <- '2019-12-01' 
+seg <- n_seg_31
+df_month_5_31 <- df_month_5_30 %>%   mutate(flag_login_31= ifelse((Creation_Date <= '2020-02-29' & Creation_Date >= '2019-12-01') & (first_trip_date <= '2020-02-29' & first_trip_date >= '2019-12-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-12-01') & (first_trip_date <= '2020-02-29' & first_trip_date >= '2019-12-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-02-28' & first_trip_date > '2020-02-28'),"",'BASE'))),segment_value_n_seg_31=ifelse( n_seg_31 <= 0 ,"Inactive",ifelse( n_seg_31> min_0 & n_seg_31<  Min_1,"very_low",ifelse(n_seg_31>= Min_1 & n_seg_31 <  Min_2,"low",ifelse(n_seg_31>= Min_2 & n_seg_31<  Min_3, "mid",ifelse(n_seg_31>= Min_3 & n_seg_28 <Min_4, "high",ifelse(n_seg_28>= Min_4 & n_seg_31 <  Min_5,"very_high",ifelse(n_seg_31>= Min_5 & n_seg_31 <  Min_6,"Extra_low",ifelse(n_seg_31>= Min_6 & n_seg_31 <  Min_7,"Extra_Mid",ifelse(n_seg_31>= Min_7 & n_seg_31 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_31 = ifelse(flag_login_31=="","", paste(flag_login_31,segment_value_n_seg_31,sep = '_')))
+
+
+#### 32
+day1 <- '2020-03-31'
+day2 <- '2020-01-01' 
+seg <- n_seg_32
+df_month_5_32 <- df_month_5_31 %>%   mutate(flag_login_32= ifelse((Creation_Date <= '2020-02-29' & Creation_Date >= '2019-12-01') & (first_trip_date <= '2020-02-29' & first_trip_date >= '2019-12-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-12-01') & (first_trip_date <= '2020-02-29' & first_trip_date >= '2019-12-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-03-31' & first_trip_date > '2020-03-31'),"",'BASE'))),segment_value_n_seg_32=ifelse( n_seg_32 <= 0 ,"Inactive",ifelse( n_seg_32> min_0 & n_seg_32<  Min_1,"very_low",ifelse(n_seg_32>= Min_1 & n_seg_32 <  Min_2,"low",ifelse(n_seg_32>= Min_2 & n_seg_32<  Min_3, "mid",ifelse(n_seg_32>= Min_3 & n_seg_32 <Min_4, "high",ifelse(n_seg_32>= Min_4 & n_seg_32 <  Min_5,"very_high",ifelse(n_seg_32>= Min_5 & n_seg_32 <  Min_6,"Extra_low",ifelse(n_seg_32>= Min_6 & n_seg_32 <  Min_7,"Extra_Mid",ifelse(n_seg_32>= Min_7 & n_seg_32 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_32 = ifelse(flag_login_32=="","", paste(flag_login_32,segment_value_n_seg_32,sep = '_')))
+#### 33
+day1 <- '2020-04-30'
+day2 <- '2020-02-01' 
+seg <- n_seg_33
+df_month_5_33 <- df_month_5_32 %>%   mutate(flag_login_33= ifelse((Creation_Date <= '2020-04-30' & Creation_Date >= '2020-02-01') & (first_trip_date <= '2020-04-30' & first_trip_date >= '2020-02-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-02-01') & (first_trip_date <= '2020-04-30' & first_trip_date >= '2020-02-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-04-30' & first_trip_date > '2020-04-30'),"",'BASE'))),segment_value_n_seg_33=ifelse( n_seg_33 <= 0 ,"Inactive",ifelse( n_seg_33> min_0 & n_seg_33<  Min_1,"very_low",ifelse(n_seg_33>= Min_1 & n_seg_33 <  Min_2,"low",ifelse(n_seg_33>= Min_2 & n_seg_33<  Min_3, "mid",ifelse(n_seg_33>= Min_3 & n_seg_33 <Min_4, "high",ifelse(n_seg_33>= Min_4 & n_seg_33 <  Min_5,"very_high",ifelse(n_seg_33>= Min_5 & n_seg_33 <  Min_6,"Extra_low",ifelse(n_seg_33>= Min_6 & n_seg_33 <  Min_7,"Extra_Mid",ifelse(n_seg_33>= Min_7 & n_seg_33 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_33 = ifelse(flag_login_33=="","", paste(flag_login_33,segment_value_n_seg_33,sep = '_')))
+#### 34
+day1 <- '2020-05-31'
+day2 <- '2020-03-01' 
+seg <- n_seg_34
+df_month_5_34 <- df_month_5_33 %>%   mutate(flag_login_34= ifelse((Creation_Date <= '2020-05-31' & Creation_Date >= '2020-03-01' ) & (first_trip_date <= '2020-05-31' & first_trip_date >= '2020-03-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-03-01' ) & (first_trip_date <= '2020-05-31' & first_trip_date >= '2020-03-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-05-31' & first_trip_date > '2020-05-31'),"",'BASE'))),segment_value_n_seg_34=ifelse( n_seg_34 <= 0 ,"Inactive",ifelse( n_seg_34> min_0 & n_seg_34<  Min_1,"very_low",ifelse(n_seg_34>= Min_1 & n_seg_34 <  Min_2,"low",ifelse(n_seg_34>= Min_2 & n_seg_34<  Min_3, "mid",ifelse(n_seg_34>= Min_3 & n_seg_34 <Min_4, "high",ifelse(n_seg_34>= Min_4 & n_seg_34 <  Min_5,"very_high",ifelse(n_seg_34>= Min_5 & n_seg_34 <  Min_6,"Extra_low",ifelse(n_seg_34>= Min_6 & n_seg_34 <  Min_7,"Extra_Mid",ifelse(n_seg_34>= Min_7 & n_seg_34 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_34 = ifelse(flag_login_34=="","", paste(flag_login_34,segment_value_n_seg_34,sep = '_')))
+#### 35
+day1 <- '2020-06-30'
+day2 <- '2020-04-01' 
+seg <- n_seg_35
+df_month_5_35 <- df_month_5_34 %>%  mutate(flag_login_35= ifelse((Creation_Date <= '2020-06-30' & Creation_Date >= '2020-04-01' ) & (first_trip_date <= '2020-06-30' & first_trip_date >= '2020-04-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-04-01' ) & (first_trip_date <= '2020-06-30' & first_trip_date >= '2020-04-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-06-30' & first_trip_date > '2020-06-30'),"",'BASE'))),segment_value_n_seg_35=ifelse( n_seg_28 <= 0 ,"Inactive",ifelse( n_seg_35> min_0 & n_seg_35<  Min_1,"very_low",ifelse(n_seg_35>= Min_1 & n_seg_35 <  Min_2,"low",ifelse(n_seg_35>= Min_2 & n_seg_35<  Min_3, "mid",ifelse(n_seg_35>= Min_3 & n_seg_35 <Min_4, "high",ifelse(n_seg_35>= Min_4 & n_seg_35 <  Min_5,"very_high",ifelse(n_seg_35>= Min_5 & n_seg_35 <  Min_6,"Extra_low",ifelse(n_seg_35>= Min_6 & n_seg_35 <  Min_7,"Extra_Mid",ifelse(n_seg_35>= Min_7 & n_seg_35 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_35 = ifelse(flag_login_35=="","", paste(flag_login_35,segment_value_n_seg_35,sep = '_')))
+#### 36
+day1 <- '2020-07-31'
+day2 <- '2020-05-01' 
+seg <- n_seg_36
+df_month_5_36 <- df_month_5_35 %>%   mutate(flag_login_36= ifelse((Creation_Date <= '2020-07-31' & Creation_Date >= '2020-05-01' ) & (first_trip_date <= '2020-07-31' & first_trip_date >= '2020-05-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-05-01' ) & (first_trip_date <= '2020-07-31' & first_trip_date >= '2020-05-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-07-31' & first_trip_date > '2020-07-31'),"",'BASE'))),segment_value_n_seg_36=ifelse( n_seg_36 <= 0 ,"Inactive",ifelse( n_seg_36> min_0 & n_seg_36<  Min_1,"very_low",ifelse(n_seg_36>= Min_1 & n_seg_36 <  Min_2,"low",ifelse(n_seg_36>= Min_2 & n_seg_36<  Min_3, "mid",ifelse(n_seg_36>= Min_3 & n_seg_36 <Min_4, "high",ifelse(n_seg_36>= Min_4 & n_seg_36 <  Min_5,"very_high",ifelse(n_seg_36>= Min_5 & n_seg_36 <  Min_6,"Extra_low",ifelse(n_seg_36>= Min_6 & n_seg_36 <  Min_7,"Extra_Mid",ifelse(n_seg_36>= Min_7 & n_seg_36 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_36 = ifelse(flag_login_36=="","", paste(flag_login_36,segment_value_n_seg_36,sep = '_')))
+#### 37
+day1 <- '2020-08-31'
+day2 <- '2020-06-01' 
+seg <- n_seg_37
+df_month_5_37 <- df_month_5_36 %>%   mutate(flag_login_37= ifelse((Creation_Date <= '2020-08-31' & Creation_Date >= '2020-06-01' ) & (first_trip_date <= '2020-08-31' & first_trip_date >= '2020-06-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-06-01' ) & (first_trip_date <= '2020-08-31' & first_trip_date >= '2020-06-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-08-31' & first_trip_date > '2020-08-31'),"",'BASE'))),segment_value_n_seg_37=ifelse( n_seg_37 <= 0 ,"Inactive",ifelse( n_seg_37> min_0 & n_seg_37<  Min_1,"very_low",ifelse(n_seg_37>= Min_1 & n_seg_37 <  Min_2,"low",ifelse(n_seg_37>= Min_2 & n_seg_37<  Min_3, "mid",ifelse(n_seg_37>= Min_3 & n_seg_37 <Min_4, "high",ifelse(n_seg_37>= Min_4 & n_seg_37 <  Min_5,"very_high",ifelse(n_seg_37>= Min_5 & n_seg_37 <  Min_6,"Extra_low",ifelse(n_seg_37>= Min_6 & n_seg_37 <  Min_7,"Extra_Mid",ifelse(n_seg_37>= Min_7 & n_seg_37 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_37 = ifelse(flag_login_37=="","", paste(flag_login_37,segment_value_n_seg_37,sep = '_')))
+#### 38
+day1 <- '2020-09-30'
+day2 <- '2020-07-01' 
+seg <- n_seg_38
+df_month_5_38 <- df_month_5_37 %>%   mutate(flag_login_38= ifelse((Creation_Date <= '2020-09-30' & Creation_Date >= '2020-07-01' ) & (first_trip_date <= '2020-09-30' & first_trip_date >= '2020-07-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-07-01') & (first_trip_date <= '2020-09-30' & first_trip_date >= '2020-07-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-09-30' & first_trip_date > '2020-09-30'),"",'BASE'))),segment_value_n_seg_38=ifelse( n_seg_38 <= 0 ,"Inactive",ifelse( n_seg_38> min_0 & n_seg_38<  Min_1,"very_low",ifelse(n_seg_38>= Min_1 & n_seg_38 <  Min_2,"low",ifelse(n_seg_38>= Min_2 & n_seg_38<  Min_3, "mid",ifelse(n_seg_38>= Min_3 & n_seg_38 <Min_4, "high",ifelse(n_seg_38>= Min_4 & n_seg_38 <  Min_5,"very_high",ifelse(n_seg_38>= Min_5 & n_seg_38 <  Min_6,"Extra_low",ifelse(n_seg_38>= Min_6 & n_seg_38 <  Min_7,"Extra_Mid",ifelse(n_seg_38>= Min_7 & n_seg_38 <  Min_8,"Extra_high","Extra_very_high"))))))))),final_segment_38 = ifelse(flag_login_38=="","", paste(flag_login_38,segment_value_n_seg_38,sep = '_')))
+#### 39
+day1 <- '2020-10-31'
+day2 <- '2020-08-01' 
+seg <- n_seg_39
+df_month_5_39 <- df_month_5_38 %>% mutate(flag_login_39= ifelse((Creation_Date <= '2020-10-31' & Creation_Date >= '2020-08-01' ) & (first_trip_date <= '2020-10-31' & first_trip_date >= '2020-08-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-08-01') & (first_trip_date <= '2020-10-31' & first_trip_date >= '2020-08-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-10-31' & first_trip_date > '2020-10-31'),"",'BASE'))),segment_value_n_seg_39=ifelse( n_seg_39 <= 0 ,"Inactive",ifelse( n_seg_39> min_0 & n_seg_39<  Min_1,"very_low",ifelse(n_seg_39>= Min_1 & n_seg_39 <  Min_2,"low",ifelse(n_seg_39>= Min_2 & n_seg_39<  Min_3, "mid",ifelse(n_seg_39>= Min_3 & n_seg_39 <Min_4, "high",ifelse(n_seg_39>= Min_4 & n_seg_39 <  Min_5,"very_high",ifelse(n_seg_39>= Min_5 & n_seg_39 <  Min_6,"Extra_low",ifelse(n_seg_39>= Min_6 & n_seg_39 <  Min_7,"Extra_Mid",ifelse(n_seg_39>= Min_7 & n_seg_39 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_39 = ifelse(flag_login_39=="","", paste(flag_login_39,segment_value_n_seg_39,sep = '_')))
+#### 40
+day1 <- '2020-11-30'
+day2 <- '2020-09-01' 
+seg <- n_seg_40
+df_month_5_40 <- df_month_5_39 %>%   mutate(flag_login_40= ifelse((Creation_Date <= '2020-11-30' & Creation_Date >= '2020-09-01' ) & (first_trip_date <= '2020-11-30' & first_trip_date >= '2020-09-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-09-01') & (first_trip_date <= '2020-11-30' & first_trip_date >= '2020-09-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-11-30' & first_trip_date > '2020-11-30'),"",'BASE'))),segment_value_n_seg_40=ifelse( n_seg_40 <= 0 ,"Inactive",ifelse( n_seg_40> min_0 & n_seg_40<  Min_1,"very_low",ifelse(n_seg_40>= Min_1 & n_seg_40 <  Min_2,"low",ifelse(n_seg_40>= Min_2 & n_seg_40<  Min_3, "mid",ifelse(n_seg_40>= Min_3 & n_seg_40 <Min_4, "high",ifelse(n_seg_40>= Min_4 & n_seg_40 <  Min_5,"very_high",ifelse(n_seg_40>= Min_5 & n_seg_40 <  Min_6,"Extra_low",ifelse(n_seg_40>= Min_6 & n_seg_40 <  Min_7,"Extra_Mid",ifelse(n_seg_40>= Min_7 & n_seg_40 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_40 = ifelse(flag_login_40=="","", paste(flag_login_40,segment_value_n_seg_40,sep = '_')))
+#### 41
+
+day1 <- '2020-12-31'
+day2 <- '2020-10-01' 
+seg <- n_seg_41
+df_month_5_41 <- df_month_5_40 %>%   mutate(flag_login_41= ifelse((Creation_Date <= '2020-12-31' & Creation_Date >= '2020-10-01' ) & (first_trip_date <='2020-12-31' & first_trip_date >= '2020-10-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <='2020-10-01') & (first_trip_date <= '2020-12-31' & first_trip_date >= '2020-10-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-12-31' & first_trip_date > '2020-12-31'),"",'BASE'))),segment_value_n_seg_41=ifelse( n_seg_41 <= 0 ,"Inactive",ifelse( n_seg_41> min_0 & n_seg_41<  Min_1,"very_low",ifelse(n_seg_41>= Min_1 & n_seg_41 <  Min_2,"low",ifelse(n_seg_41>= Min_2 & n_seg_41<  Min_3, "mid",ifelse(n_seg_41>= Min_3 & n_seg_41 <Min_4, "high",ifelse(n_seg_41>= Min_4 & n_seg_41 <  Min_5,"very_high",ifelse(n_seg_41>= Min_5 & n_seg_41 <  Min_6,"Extra_low",ifelse(n_seg_41>= Min_6 & n_seg_41 <  Min_7,"Extra_Mid",ifelse(n_seg_41>= Min_7 & n_seg_41 <  Min_8,"Extra_high","Extra_very_high"))))))))), final_segment_41 = ifelse(flag_login_41=="","", paste(flag_login_41,segment_value_n_seg_41,sep = '_')))
+###########
+df_month_5_chack <- over_all %>% filter(n_seg_41 == 0 & n_seg_41_or != 0)
+df_month_5_chack
+#### 1df_month_5_chack
 
 ####
 today <-  today()
 
- 
-over_all_3
-over_all_1 <- df_month_7 %>% left_join(df_month_3_o,by= "rider")
+ library(openxlsx)
+
+over_all_1 <- df_month_5_41 %>% left_join(df_month_3_o,by= "rider")
 over_all_2 <- over_all_1 %>% left_join(df_month_3_tr,by= "rider")
-over_all_3 <- over_all_2 %>% left_join(df_month_3_v,by= "rider")
+over_all_3 <- over_all_2 %>% left_join(df_month_3_v,by= "rider") %>% dplyr::select(-c(first_trip_date,Creation_Date))
 over_all_4 <- df %>% filter( pickup_WL_most_use == "Alger" ) %>% dplyr::distinct(rider,Creation_Date,last_trip_date,first_trip_date)  %>%  mutate(passivity=as.numeric(difftime(today,last_trip_date),units="days"))
 over_all <- over_all_4 %>% left_join(over_all_3,by= "rider")
+glimpse(over_all)
 
+write.csv(over_all,"E:/Git_RStudio_Project/Profiling_rider_202011/Segmentation/over_all.csv")
 
+## over_all_aggregation
+over_all_check <- over_all %>% group_by(flag_login_41,segment_value_n_seg_41,final_segment_41,flag_login_31,segment_value_n_seg_31,final_segment_31) %>% summarise(nb=n(),n_seg_41_or= sum(n_seg_41_or),o_seg_41=sum(o_seg_41),n_seg_41_tr=sum(n_seg_41_tr),t_seg_41 =sum(t_seg_41),n_seg_41 =sum(n_seg_41),t_seg_41 =sum(t_seg_41),n_seg_41_rv =sum(n_seg_41_rv),rv_seg_41 =sum(rv_seg_41),n_seg_31_or= sum(n_seg_31_or),o_seg_31=sum(o_seg_31),n_seg_31_tr=sum(n_seg_31_tr),t_seg_31 =sum(t_seg_31),n_seg_31 =sum(n_seg_31),e_seg_31 =sum(e_seg_31),n_seg_31_rv =sum(n_seg_31_rv),rv_seg_31 =sum(rv_seg_31))
 
+dim(over_all_check)
+
+write.csv(over_all_check,'E:/Git_RStudio_Project/Profiling_rider_202011/Segmentation/over_all_check.csv')
+df_month_5_chack
+gc()
 ```
 

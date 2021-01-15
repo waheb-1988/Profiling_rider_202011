@@ -1,0 +1,155 @@
+---
+title: "Driver Segmentation"
+output: 
+  html_notebook:
+    code_folding: hide
+---
+
+
+
+```{r}
+library(tidyverse)
+library(bigrquery)
+library(lubridate)
+
+con <- dbConnect(
+  bigrquery::bigquery(),
+  project = "yassir-data-project",
+  dataset = "YassirGo",
+  billing = "yassir-data-project"
+)
+
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+```
+
+
+```{r}
+sql <- "SELECT
+  A.rider,
+  request_date,
+  top_wilaya,
+  trip_category,
+  finished_trips,
+  original_cost
+FROM (
+  SELECT
+    rider,
+    request_date,
+    trip_category,
+    COUNT(DISTINCT trip_id) AS finished_trips,
+    SUM(original_cost) AS original_cost
+  FROM (
+    SELECT
+      rider,
+      DATE(requested_at.date, 'Africa/Algiers') AS request_date,
+      _id.oid AS trip_id,
+      CASE
+        WHEN (subscriber = FALSE OR subscriber IS NULL) THEN 'B2C'
+      ELSE
+      'B2B'
+    END
+      AS trip_category,
+      CASE
+        WHEN original_cost IS NULL THEN estimated_cost
+      ELSE
+      original_cost
+    END
+      AS original_cost,
+      ROW_NUMBER() OVER(PARTITION BY _id.oid ORDER BY updated_at.date DESC) AS rank
+    FROM
+      `yassir-data-project.YassirGo.trips_production`
+    WHERE
+      pickup_details.lvl0_label IN ('Algérie',
+        'Alg��rie')
+      AND status = 'FINISHED')
+  WHERE
+    rank = 1
+  GROUP BY
+    rider,
+    request_date,
+    trip_category) A
+LEFT JOIN (
+  SELECT
+    rider,
+    wilaya AS top_wilaya
+  FROM (
+    SELECT
+      rider,
+      wilaya,
+      finished_trips,
+      ROW_NUMBER() OVER(PARTITION BY rider ORDER BY finished_trips DESC) AS index
+    FROM (
+      SELECT
+        rider,
+        pickup_details.lvl1_label AS wilaya,
+        COUNT(DISTINCT _id.oid ) AS finished_trips
+      FROM
+        `yassir-data-project.YassirGo.trips_production`
+      WHERE
+        pickup_details.lvl0_label IN ('Algérie',
+          'Alg��rie')
+        AND status = 'FINISHED'
+      GROUP BY
+        rider,
+        wilaya))
+  WHERE
+    index IN (1)) B
+ON
+  A.rider = B.rider
+ORDER BY
+    rider,
+    request_date"
+
+df <- DBI::dbGetQuery(con, sql)
+```
+
+
+```{r}
+check <- df  %>% filter(request_date < '2020-12-01') %>% dplyr::distinct(rider)
+dim(check)
+
+df_90days <- df  %>% filter(request_date < '2020-12-01') %>% dplyr::select(rider,request_date) %>%  
+  arrange(rider,request_date)%>% group_by(rider) %>%mutate(gap=round(c(NA,diff(request_date)), 1)) %>%
+filter(!is.na(gap)) %>% group_by(rider) %>% summarise(average=round(mean(gap,0)))%>% arrange(desc(average))  %>% 
+                                              group_by (average) %>%
+                                              summarise (effective = n()) %>%
+                                              mutate (total_effective =sum(effective),rate=                       effective/total_effective,Cum_effective=cumsum(rate)*100)%>%
+                                             
+                                              
+                                              ggplot(aes(average,Cum_effective))+
+                                              geom_line(color = "red")+
+                                              geom_line(color = "red")+
+                                              geom_vline(xintercept=90, linetype="dashed", color = "black")+
+                                             
+                                              geom_hline(yintercept=90, linetype="dashed", color = "black")+
+                                             
+                                              labs(x = "# seg_32", y="% Effective" )
+df_90days 
+  
+
+### Data for Excel
+
+first_graph_churn_limit_min <- df  %>% filter(request_date < '2020-12-01') %>% dplyr::select(rider,request_date) %>%  
+  arrange(rider,request_date)%>% group_by(rider) %>%mutate(gap=round(c(NA,diff(request_date)), 1)) %>%
+filter(!is.na(gap)) %>% group_by(rider) %>% summarise(average=round(min(gap,0)))%>% arrange(desc(average))  %>% 
+                                              group_by (average) %>%
+                                              summarise (effective = n()) %>%
+                                              mutate (total_effective =sum(effective),rate=                       effective/total_effective,Cum_effective=cumsum(rate)*100)
+  
+write.csv(first_graph_churn_limit_min,'E:/Git_RStudio_Project/Profiling_rider_202011/Excel_data_plot/churn_plot_min.csv')
+first_graph_churn_limit_min
+day_of_use <- df  %>% filter(request_date < '2020-12-01') %>% dplyr::select(rider,request_date) %>%  
+  arrange(rider,request_date)%>% group_by(rider)%>% summarise(nb_day_use=n_distinct(request_date)) %>% group_by(nb_day_use) %>% summarise(riders=n_distinct(rider))
+day_of_use
+  
+write.csv(day_of_use,'E:/Git_RStudio_Project/Profiling_rider_202011/Excel_data_plot/day_of_use_plot.csv')
+
+22996/137516
+
+
+```
+```{r}
+
+```
+
+

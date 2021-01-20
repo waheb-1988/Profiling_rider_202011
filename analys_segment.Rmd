@@ -9,6 +9,8 @@ output: html_notebook
 # Mapp all the targets + profile
 
 ```{r}
+library(broom)
+library(sigr)
 library(purrr)
 library(ggplot2)
 library(dplyr)
@@ -52,6 +54,7 @@ library(factoextra)
 library(ClustOfVar)
 library(GGally)
 library(lubridate)
+library(patchwork)
 db <- dbConnect(
  bigrquery::bigquery(),
  project = "yassir-data-project",
@@ -144,14 +147,53 @@ df_month <- df %>% filter(pickup_WL_most_use == "Alger") %>% mutate(month_year= 
 `2020_12_n`=`2020_12`*31/30
 ) 
 
-
 ## 
-df_month_t <- df %>% filter(pickup_WL_most_use == "Alger")%>% mutate(month_year= paste(Year_Trip,Month_Trip,sep = '_'),segment_date=strftime(Creation_Date,format="%Y-%m")) %>% filter (!is.na(Creation_Date))%>% dplyr::distinct(rider,segment_date,Year_Trip,Month_Trip,month_year,nb_trips,original_cost,estimated_cost,nb_day_use) %>% arrange(rider,Year_Trip,Month_Trip,month_year) %>%  dplyr::distinct(rider,month_year,estimated_cost) %>% spread(month_year,estimated_cost) %>% mutate_if(is.numeric, funs(ifelse(is.na(.), 0, 1)))
+df_month_t <- df %>% filter(pickup_WL_most_use == "Alger")%>% mutate(month_year= paste(Year_Trip,Month_Trip,sep = '_'),segment_date=strftime(Creation_Date,format="%Y-%m")) %>% filter (!is.na(Creation_Date))%>% dplyr::distinct(rider,first_trip_date,segment_date,Year_Trip,Month_Trip,month_year,nb_trips,original_cost,estimated_cost,nb_day_use) %>% arrange(rider,Year_Trip,Month_Trip,month_year) %>%  dplyr::distinct(rider,first_trip_date,month_year,estimated_cost) %>% spread(month_year,estimated_cost) %>% mutate_if(is.numeric, funs(ifelse(is.na(.), 0, 1))) %>% mutate(month_use = (`2017_6`+`2017_7`+`2017_8`+`2017_9`+`2017_10`+`2017_11`+`2017_12`+`2018_1`+`2018_2`+`2018_3`+`2018_4`+`2018_5`+`2018_6`+`2018_7`+`2018_8`+`2018_9`+`2018_10`+`2018_11`+`2018_12`+`2019_1`+`2019_2`+`2019_3`+`2019_4`+`2019_5`+`2019_6`+`2019_7`+`2019_8`+`2019_9`+`2019_10`+`2019_11`+`2019_12`+`2020_1`+`2020_2`+`2020_3`+`2020_4`+`2020_5`+`2020_6`+`2020_7`+`2020_8`+`2020_9`+`2020_10`+`2020_11`+`2020_12`),month_age =round((as.numeric(difftime('2020-12-31',first_trip_date),units="days")/30)+1 ),seg_m_1_t = ifelse(first_trip_date<='2017-06-30',3,ifelse(first_trip_date>='2017-07-01'&first_trip_date<='2017-07-31',2,ifelse(first_trip_date>='2017-08-01'&first_trip_date<='2017-08-31',1,NA))),
+seg_m_2_t = ifelse(first_trip_date<='2017-07-31',3,ifelse(first_trip_date>='2017-08-01'&first_trip_date<='2017-08-31',2,ifelse(first_trip_date>='2017-09-01'&first_trip_date<='2017-09-30',1,NA))),
+seg_m_3_t = ifelse(first_trip_date<='2017-08-31',3,ifelse(first_trip_date>='2017-09-01'&first_trip_date<='2017-09-30',2,ifelse(first_trip_date>='2017-10-01'&first_trip_date<='2017-10-31',1,NA))),
+seg_m_4_t = ifelse(first_trip_date<='2017-09-30',3,ifelse(first_trip_date>='2017-10-01'&first_trip_date<='2017-10-31',2,ifelse(first_trip_date>='2017-11-01'&first_trip_date<='2017-11-30',1,NA))),
+seg_m_5_t = ifelse(first_trip_date<='2017-10-31',3,ifelse(first_trip_date>='2017-11-01'&first_trip_date<='2017-11-30',2,ifelse(first_trip_date>='2017-12-01'&first_trip_date<='2017-12-31',1,NA))),
+seg_m_6_t = ifelse(first_trip_date<='2017-11-30',3,ifelse(first_trip_date>='2017-12-01'&first_trip_date<='2017-12-31',2,ifelse(first_trip_date>='2018-01-01'&first_trip_date<='2018-01-31',1,NA))),
+seg_m_7_t = ifelse(first_trip_date<='2017-12-31',3,ifelse(first_trip_date>='2018-01-01'&first_trip_date<='2018-01-31',2,ifelse(first_trip_date>='2018-02-01'&first_trip_date<='2018-02-28',1,NA))),
+seg_m_8_t = ifelse(first_trip_date<='2018-01-31',3,ifelse(first_trip_date>='2018-02-01'&first_trip_date<='2018-02-28',2,ifelse(first_trip_date>='2018-03-01'&first_trip_date<='2018-03-31',1,NA))),
+seg_m_9_t = ifelse(first_trip_date<='2018-02-28',3,ifelse(first_trip_date>='2018-03-01'&first_trip_date<='2018-03-31',2,ifelse(first_trip_date>='2018-04-01'&first_trip_date<='2018-04-30',1,NA))),
+seg_m_10_t = ifelse(first_trip_date<='2018-03-31',3,ifelse(first_trip_date>='2018-04-01'&first_trip_date<='2018-04-30',2,ifelse(first_trip_date>='2018-05-01'&first_trip_date<='2018-05-31',1,NA))),
+seg_m_11_t = ifelse(first_trip_date<='2018-04-30',3,ifelse(first_trip_date>='2018-05-01'&first_trip_date<='2018-05-31',2,ifelse(first_trip_date>='2018-06-01'&first_trip_date<='2018-06-30',1,NA))),
+seg_m_12_t = ifelse(first_trip_date<='2018-05-31',3,ifelse(first_trip_date>='2018-06-01'&first_trip_date<='2018-06-30',2,ifelse(first_trip_date>='2018-07-01'&first_trip_date<='2018-07-31',1,NA))),
+seg_m_13_t = ifelse(first_trip_date<='2018-06-30',3,ifelse(first_trip_date>='2018-07-01'&first_trip_date<='2018-07-31',2,ifelse(first_trip_date>='2018-08-01'&first_trip_date<='2018-08-31',1,NA))),
+seg_m_14_t = ifelse(first_trip_date<='2018-07-31',3,ifelse(first_trip_date>='2018-08-01'&first_trip_date<='2018-08-31',2,ifelse(first_trip_date>='2018-09-01'&first_trip_date<='2018-09-30',1,NA))),
+seg_m_15_t = ifelse(first_trip_date<='2018-08-31',3,ifelse(first_trip_date>='2018-09-01'&first_trip_date<='2018-09-30',2,ifelse(first_trip_date>='2018-10-01'&first_trip_date<='2018-10-31',1,NA))),
+seg_m_16_t = ifelse(first_trip_date<='2018-09-30',3,ifelse(first_trip_date>='2018-10-01'&first_trip_date<='2018-10-31',2,ifelse(first_trip_date>='2018-11-01'&first_trip_date<='2018-11-30',1,NA))),
+seg_m_17_t = ifelse(first_trip_date<='2018-10-31',3,ifelse(first_trip_date>='2018-11-01'&first_trip_date<='2018-11-30',2,ifelse(first_trip_date>='2018-12-01'&first_trip_date<='2018-12-31',1,NA))),
+seg_m_18_t = ifelse(first_trip_date<='2018-11-30',3,ifelse(first_trip_date>='2018-12-01'&first_trip_date<='2018-12-31',2,ifelse(first_trip_date>='2019-01-01'&first_trip_date<='2019-01-31',1,NA))),
+seg_m_19_t = ifelse(first_trip_date<='2018-12-31',3,ifelse(first_trip_date>='2019-01-01'&first_trip_date<='2019-01-31',2,ifelse(first_trip_date>='2019-02-01'&first_trip_date<='2019-02-28',1,NA))),
+seg_m_20_t = ifelse(first_trip_date<='2019-01-31',3,ifelse(first_trip_date>='2019-02-01'&first_trip_date<='2019-02-28',2,ifelse(first_trip_date>='2019-03-01'&first_trip_date<='2019-03-31',1,NA))),
+seg_m_21_t = ifelse(first_trip_date<='2019-02-28',3,ifelse(first_trip_date>='2019-03-01'&first_trip_date<='2019-03-31',2,ifelse(first_trip_date>='2019-04-01'&first_trip_date<='2019-04-30',1,NA))),
+seg_m_22_t = ifelse(first_trip_date<='2019-03-31',3,ifelse(first_trip_date>='2019-04-01'&first_trip_date<='2019-04-30',2,ifelse(first_trip_date>='2019-05-01'&first_trip_date<='2019-05-31',1,NA))),
+seg_m_23_t = ifelse(first_trip_date<='2019-04-30',3,ifelse(first_trip_date>='2019-05-01'&first_trip_date<='2019-05-31',2,ifelse(first_trip_date>='2019-06-01'&first_trip_date<='2019-06-30',1,NA))),
+seg_m_24_t = ifelse(first_trip_date<='2019-05-31',3,ifelse(first_trip_date>='2019-06-01'&first_trip_date<='2019-06-30',2,ifelse(first_trip_date>='2019-07-01'&first_trip_date<='2019-07-31',1,NA))),
+seg_m_25_t = ifelse(first_trip_date<='2019-06-30',3,ifelse(first_trip_date>='2019-07-01'&first_trip_date<='2019-07-31',2,ifelse(first_trip_date>='2019-08-01'&first_trip_date<='2019-08-31',1,NA))),
+seg_m_26_t = ifelse(first_trip_date<='2019-07-31',3,ifelse(first_trip_date>='2019-08-01'&first_trip_date<='2019-08-31',2,ifelse(first_trip_date>='2019-09-01'&first_trip_date<='2019-09-30',1,NA))),
+seg_m_27_t = ifelse(first_trip_date<='2019-08-31',3,ifelse(first_trip_date>='2019-09-01'&first_trip_date<='2019-09-30',2,ifelse(first_trip_date>='2019-10-01'&first_trip_date<='2019-10-31',1,NA))),
+seg_m_28_t = ifelse(first_trip_date<='2019-09-30',3,ifelse(first_trip_date>='2019-10-01'&first_trip_date<='2019-10-31',2,ifelse(first_trip_date>='2019-11-01'&first_trip_date<='2019-11-30',1,NA))),
+seg_m_29_t = ifelse(first_trip_date<='2019-10-31',3,ifelse(first_trip_date>='2019-11-01'&first_trip_date<='2019-11-30',2,ifelse(first_trip_date>='2019-12-01'&first_trip_date<='2019-12-31',1,NA))),
+seg_m_30_t = ifelse(first_trip_date<='2019-11-30',3,ifelse(first_trip_date>='2019-12-01'&first_trip_date<='2019-12-31',2,ifelse(first_trip_date>='2020-01-01'&first_trip_date<='2020-01-31',1,NA))),
+seg_m_31_t = ifelse(first_trip_date<='2019-12-31',3,ifelse(first_trip_date>='2020-01-01'&first_trip_date<='2020-01-31',2,ifelse(first_trip_date>='2020-02-01'&first_trip_date<='2020-02-29',1,NA))),
+seg_m_32_t = ifelse(first_trip_date<='2020-01-31',3,ifelse(first_trip_date>='2020-02-01'&first_trip_date<='2020-02-28',2,ifelse(first_trip_date>='2020-03-01'&first_trip_date<='2020-03-31',1,NA))),
+seg_m_33_t = ifelse(first_trip_date<='2020-02-28',3,ifelse(first_trip_date>='2020-03-01'&first_trip_date<='2020-03-31',2,ifelse(first_trip_date>='2020-04-01'&first_trip_date<='2020-04-30',1,NA))),
+seg_m_34_t = ifelse(first_trip_date<='2020-03-31',3,ifelse(first_trip_date>='2020-04-01'&first_trip_date<='2020-04-30',2,ifelse(first_trip_date>='2020-05-01'&first_trip_date<='2020-05-31',1,NA))),
+seg_m_35_t = ifelse(first_trip_date<='2020-04-30',3,ifelse(first_trip_date>='2020-05-01'&first_trip_date<='2020-05-31',2,ifelse(first_trip_date>='2020-06-01'&first_trip_date<='2020-06-30',1,NA))),
+seg_m_36_t = ifelse(first_trip_date<='2020-05-31',3,ifelse(first_trip_date>='2020-06-01'&first_trip_date<='2020-06-30',2,ifelse(first_trip_date>='2020-07-01'&first_trip_date<='2020-07-31',1,NA))),
+seg_m_37_t = ifelse(first_trip_date<='2020-06-30',3,ifelse(first_trip_date>='2020-07-01'&first_trip_date<='2020-07-31',2,ifelse(first_trip_date>='2020-08-01'&first_trip_date<='2020-08-31',1,NA))),
+seg_m_38_t = ifelse(first_trip_date<='2020-07-31',3,ifelse(first_trip_date>='2020-08-01'&first_trip_date<='2020-08-31',2,ifelse(first_trip_date>='2020-09-01'&first_trip_date<='2020-09-30',1,NA))),
+seg_m_39_t = ifelse(first_trip_date<='2020-08-31',3,ifelse(first_trip_date>='2020-09-01'&first_trip_date<='2020-09-30',2,ifelse(first_trip_date>='2020-10-01'&first_trip_date<='2020-10-31',1,NA))),
+seg_m_40_t = ifelse(first_trip_date<='2020-09-30',3,ifelse(first_trip_date>='2020-10-01'&first_trip_date<='2020-10-31',2,ifelse(first_trip_date>='2020-11-01'&first_trip_date<='2020-11-30',1,NA))),
+seg_m_41_t = ifelse(first_trip_date<='2020-10-31',3,ifelse(first_trip_date>='2020-11-01'&first_trip_date<='2020-11-30',2,ifelse(first_trip_date>='2020-12-01'&first_trip_date<='2020-12-31',1,NA))))
+
 
 #### Sum Normalized estimated cost
 
 df_month$seg_1 <- rowSums(subset(df_month,select =c(`2017_6_n`,`2017_7_n`,`2017_8_n`)), na.rm = TRUE) 
-
 df_month$seg_2 <- rowSums(subset(df_month,select =c(`2017_7_n`,`2017_8_n`,`2017_9_n`)), na.rm = TRUE)
 df_month$seg_3 <- rowSums(subset(df_month,select =c(`2017_8_n`,`2017_9_n`,`2017_10_n`)), na.rm = TRUE)
 df_month$seg_4 <- rowSums(subset(df_month,select =c(`2017_9_n`,`2017_10_n`,`2017_11_n`)), na.rm = TRUE)
@@ -237,8 +279,10 @@ df_month_t$seg_m_39 <- rowSums(subset(df_month_t,select =c(`2020_8`,`2020_9`,`20
 df_month_t$seg_m_40 <- rowSums(subset(df_month_t,select =c(`2020_9`,`2020_10`,`2020_11`)), na.rm = TRUE)
 df_month_t$seg_m_41 <- rowSums(subset(df_month_t,select =c(`2020_10`,`2020_11`,`2020_12`)), na.rm = TRUE)
 
+df_month_t <- df_month_t %>% dplyr::select(-(first_trip_date))
 
-df_month_3 <- df_month %>% left_join(df_month_t, by="rider") %>% dplyr::select(rider,first_trip_date,Creation_Date,segment_date,starts_with("seg")) %>% mutate(n_seg_1  =  seg_1/seg_m_1,
+df_month_3 <- df_month %>% left_join(df_month_t, by="rider") %>% dplyr::select(rider,Creation_Date,first_trip_date,segment_date,starts_with("seg")) %>%
+mutate(n_seg_1  =  seg_1/seg_m_1,
 n_seg_2  =  seg_2/seg_m_2,
 n_seg_3  =  seg_3/seg_m_3,
 n_seg_4  =  seg_4/seg_m_4,
@@ -279,6 +323,47 @@ n_seg_38  =  seg_38/seg_m_38,
 n_seg_39  =  seg_39/seg_m_39,
 n_seg_40  =  seg_40/seg_m_40,
 n_seg_41  =  seg_41/seg_m_41,
+n_seg_1_t  =  seg_1/seg_m_1_t,
+n_seg_2_t  =  seg_2/seg_m_2_t,
+n_seg_3_t  =  seg_3/seg_m_3_t,
+n_seg_4_t  =  seg_4/seg_m_4_t,
+n_seg_5_t  =  seg_5/seg_m_5_t,
+n_seg_6_t  =  seg_6/seg_m_6_t,
+n_seg_7_t  =  seg_7/seg_m_7_t,
+n_seg_8_t  =  seg_8/seg_m_8_t,
+n_seg_9_t  =  seg_9/seg_m_9_t,
+n_seg_10_t  =  seg_10/seg_m_10_t,
+n_seg_11_t  =  seg_11/seg_m_11_t,
+n_seg_12_t  =  seg_12/seg_m_12_t,
+n_seg_13_t  =  seg_13/seg_m_13_t,
+n_seg_14_t  =  seg_14/seg_m_14_t,
+n_seg_15_t  =  seg_15/seg_m_15_t,
+n_seg_16_t  =  seg_16/seg_m_16_t,
+n_seg_17_t  =  seg_17/seg_m_17_t,
+n_seg_18_t  =  seg_18/seg_m_18_t,
+n_seg_19_t  =  seg_19/seg_m_19_t,
+n_seg_20_t  =  seg_20/seg_m_20_t,
+n_seg_21_t  =  seg_21/seg_m_21_t,
+n_seg_22_t  =  seg_22/seg_m_22_t,
+n_seg_23_t  =  seg_23/seg_m_23_t,
+n_seg_24_t  =  seg_24/seg_m_24_t,
+n_seg_25_t  =  seg_25/seg_m_25_t,
+n_seg_26_t  =  seg_26/seg_m_26_t,
+n_seg_27_t  =  seg_27/seg_m_27_t,
+n_seg_28_t  =  seg_28/seg_m_28_t,
+n_seg_29_t  =  seg_29/seg_m_29_t,
+n_seg_30_t  =  seg_30/seg_m_30_t,
+n_seg_31_t  =  seg_31/seg_m_31_t,
+n_seg_32_t  =  seg_32/seg_m_32_t,
+n_seg_33_t  =  seg_33/seg_m_33_t,
+n_seg_34_t  =  seg_34/seg_m_34_t,
+n_seg_35_t  =  seg_35/seg_m_35_t,
+n_seg_36_t  =  seg_36/seg_m_36_t,
+n_seg_37_t  =  seg_37/seg_m_37_t,
+n_seg_38_t  =  seg_38/seg_m_38_t,
+n_seg_39_t  =  seg_39/seg_m_39_t,
+n_seg_40_t  =  seg_40/seg_m_40_t,
+n_seg_41_t  =  seg_41/seg_m_41_t,
 e_seg_1=seg_1,
 e_seg_2=seg_2,
 e_seg_3=seg_3,
@@ -320,11 +405,11 @@ e_seg_38=seg_38,
 e_seg_39=seg_39,
 e_seg_40=seg_40,
 e_seg_41=seg_41
-) %>% dplyr::select(rider,Creation_Date,first_trip_date,segment_date,starts_with("n"),starts_with("e"))%>% mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .))) 
+) %>% dplyr::select(rider,Creation_Date,first_trip_date,segment_date,starts_with("n"),starts_with("e") ,starts_with("month"))%>% mutate_if(is.numeric, funs(ifelse(is.na(.), 0, .))) 
 
 is.num <- sapply(df_month_3, is.numeric)
 df_month_3[is.num] <- lapply(df_month_3[is.num], round, 0)
-df_month_3
+
 
 ###
 
@@ -459,6 +544,47 @@ n_seg_38_or  =  seg_38/seg_m_38,
 n_seg_39_or  =  seg_39/seg_m_39,
 n_seg_40_or  =  seg_40/seg_m_40,
 n_seg_41_or  =  seg_41/seg_m_41,
+n_seg_1_or_t  =  seg_1/seg_m_1_t,
+n_seg_2_or_t  =  seg_2/seg_m_2_t,
+n_seg_3_or_t  =  seg_3/seg_m_3_t,
+n_seg_4_or_t  =  seg_4/seg_m_4_t,
+n_seg_5_or_t  =  seg_5/seg_m_5_t,
+n_seg_6_or_t  =  seg_6/seg_m_6_t,
+n_seg_7_or_t  =  seg_7/seg_m_7_t,
+n_seg_8_or_t  =  seg_8/seg_m_8_t,
+n_seg_9_or_t  =  seg_9/seg_m_9_t,
+n_seg_10_or_t  =  seg_10/seg_m_10_t,
+n_seg_11_or_t  =  seg_11/seg_m_11_t,
+n_seg_12_or_t  =  seg_12/seg_m_12_t,
+n_seg_13_or_t  =  seg_13/seg_m_13_t,
+n_seg_14_or_t  =  seg_14/seg_m_14_t,
+n_seg_15_or_t  =  seg_15/seg_m_15_t,
+n_seg_16_or_t  =  seg_16/seg_m_16_t,
+n_seg_17_or_t  =  seg_17/seg_m_17_t,
+n_seg_18_or_t  =  seg_18/seg_m_18_t,
+n_seg_19_or_t  =  seg_19/seg_m_19_t,
+n_seg_20_or_t  =  seg_20/seg_m_20_t,
+n_seg_21_or_t  =  seg_21/seg_m_21_t,
+n_seg_22_or_t  =  seg_22/seg_m_22_t,
+n_seg_23_or_t  =  seg_23/seg_m_23_t,
+n_seg_24_or_t  =  seg_24/seg_m_24_t,
+n_seg_25_or_t  =  seg_25/seg_m_25_t,
+n_seg_26_or_t  =  seg_26/seg_m_26_t,
+n_seg_27_or_t  =  seg_27/seg_m_27_t,
+n_seg_28_or_t  =  seg_28/seg_m_28_t,
+n_seg_29_or_t  =  seg_29/seg_m_29_t,
+n_seg_30_or_t  =  seg_30/seg_m_30_t,
+n_seg_31_or_t  =  seg_31/seg_m_31_t,
+n_seg_32_or_t  =  seg_32/seg_m_32_t,
+n_seg_33_or_t  =  seg_33/seg_m_33_t,
+n_seg_34_or_t  =  seg_34/seg_m_34_t,
+n_seg_35_or_t  =  seg_35/seg_m_35_t,
+n_seg_36_or_t  =  seg_36/seg_m_36_t,
+n_seg_37_or_t  =  seg_37/seg_m_37_t,
+n_seg_38_or_t  =  seg_38/seg_m_38_t,
+n_seg_39_or_t  =  seg_39/seg_m_39_t,
+n_seg_40_or_t  =  seg_40/seg_m_40_t,
+n_seg_41_or_t  =  seg_41/seg_m_41_t,
 o_seg_1=seg_1,
 o_seg_2=seg_2,
 o_seg_3=seg_3,
@@ -642,6 +768,47 @@ n_seg_38_tr  =  seg_38/seg_m_38,
 n_seg_39_tr  =  seg_39/seg_m_39,
 n_seg_40_tr  =  seg_40/seg_m_40,
 n_seg_41_tr  =  seg_41/seg_m_41,
+n_seg_1_tr_t  =  seg_1/seg_m_1_t,
+n_seg_2_tr_t  =  seg_2/seg_m_2_t,
+n_seg_3_tr_t  =  seg_3/seg_m_3_t,
+n_seg_4_tr_t  =  seg_4/seg_m_4_t,
+n_seg_5_tr_t  =  seg_5/seg_m_5_t,
+n_seg_6_tr_t  =  seg_6/seg_m_6_t,
+n_seg_7_tr_t  =  seg_7/seg_m_7_t,
+n_seg_8_tr_t  =  seg_8/seg_m_8_t,
+n_seg_9_tr_t  =  seg_9/seg_m_9_t,
+n_seg_10_tr_t =  seg_10/seg_m_10_t,
+n_seg_11_tr_t  =  seg_11/seg_m_11_t,
+n_seg_12_tr_t  =  seg_12/seg_m_12_t,
+n_seg_13_tr_t  =  seg_13/seg_m_13_t,
+n_seg_14_tr_t  =  seg_14/seg_m_14_t,
+n_seg_15_tr_t  =  seg_15/seg_m_15_t,
+n_seg_16_tr_t  =  seg_16/seg_m_16_t,
+n_seg_17_tr_t  =  seg_17/seg_m_17_t,
+n_seg_18_tr_t  =  seg_18/seg_m_18_t,
+n_seg_19_tr_t  =  seg_19/seg_m_19_t,
+n_seg_20_tr_t  =  seg_20/seg_m_20_t,
+n_seg_21_tr_t  =  seg_21/seg_m_21_t,
+n_seg_22_tr_t  =  seg_22/seg_m_22_t,
+n_seg_23_tr_t  =  seg_23/seg_m_23_t,
+n_seg_24_tr_t  =  seg_24/seg_m_24_t,
+n_seg_25_tr_t  =  seg_25/seg_m_25_t,
+n_seg_26_tr_t  =  seg_26/seg_m_26_t,
+n_seg_27_tr_t  =  seg_27/seg_m_27_t,
+n_seg_28_tr_t  =  seg_28/seg_m_28_t,
+n_seg_29_tr_t  =  seg_29/seg_m_29_t,
+n_seg_30_tr_t  =  seg_30/seg_m_30_t,
+n_seg_31_tr_t  =  seg_31/seg_m_31_t,
+n_seg_32_tr_t  =  seg_32/seg_m_32_t,
+n_seg_33_tr_t  =  seg_33/seg_m_33_t,
+n_seg_34_tr_t  =  seg_34/seg_m_34_t,
+n_seg_35_tr_t  =  seg_35/seg_m_35_t,
+n_seg_36_tr_t  =  seg_36/seg_m_36_t,
+n_seg_37_tr_t  =  seg_37/seg_m_37_t,
+n_seg_38_tr_t  =  seg_38/seg_m_38_t,
+n_seg_39_tr_t  =  seg_39/seg_m_39_t,
+n_seg_40_tr_t  =  seg_40/seg_m_40_t,
+n_seg_41_tr_t  =  seg_41/seg_m_41_t,
 t_seg_1=seg_1,
 t_seg_2=seg_2,
 t_seg_3=seg_3,
@@ -823,6 +990,47 @@ n_seg_38_rv  =  seg_38/seg_m_38,
 n_seg_39_rv  =  seg_39/seg_m_39,
 n_seg_40_rv  =  seg_40/seg_m_40,
 n_seg_41_rv  =  seg_41/seg_m_41,
+n_seg_1_rv_t  =  seg_1/seg_m_1_t,
+n_seg_2_rv_t  =  seg_2/seg_m_2_t,
+n_seg_3_rv_t  =  seg_3/seg_m_3_t,
+n_seg_4_rv_t  =  seg_4/seg_m_4_t,
+n_seg_5_rv_t  =  seg_5/seg_m_5_t,
+n_seg_6_rv_t  =  seg_6/seg_m_6_t,
+n_seg_7_rv_t  =  seg_7/seg_m_7_t,
+n_seg_8_rv_t  =  seg_8/seg_m_8_t,
+n_seg_9_rv_t  =  seg_9/seg_m_9_t,
+n_seg_10_rv_t  =  seg_10/seg_m_10_t,
+n_seg_11_rv_t  =  seg_11/seg_m_11_t,
+n_seg_12_rv_t  =  seg_12/seg_m_12_t,
+n_seg_13_rv_t  =  seg_13/seg_m_13_t,
+n_seg_14_rv_t  =  seg_14/seg_m_14_t,
+n_seg_15_rv_t  =  seg_15/seg_m_15_t,
+n_seg_16_rv_t  =  seg_16/seg_m_16_t,
+n_seg_17_rv_t  =  seg_17/seg_m_17_t,
+n_seg_18_rv_t  =  seg_18/seg_m_18_t,
+n_seg_19_rv_t  =  seg_19/seg_m_19_t,
+n_seg_20_rv_t  =  seg_20/seg_m_20_t,
+n_seg_21_rv_t  =  seg_21/seg_m_21_t,
+n_seg_22_rv_t  =  seg_22/seg_m_22_t,
+n_seg_23_rv_t  =  seg_23/seg_m_23_t,
+n_seg_24_rv_t  =  seg_24/seg_m_24_t,
+n_seg_25_rv_t  =  seg_25/seg_m_25_t,
+n_seg_26_rv_t  =  seg_26/seg_m_26_t,
+n_seg_27_rv_t  =  seg_27/seg_m_27_t,
+n_seg_28_rv_t  =  seg_28/seg_m_28_t,
+n_seg_29_rv_t  =  seg_29/seg_m_29_t,
+n_seg_30_rv_t  =  seg_30/seg_m_30_t,
+n_seg_31_rv_t  =  seg_31/seg_m_31_t,
+n_seg_32_rv_t  =  seg_32/seg_m_32_t,
+n_seg_33_rv_t  =  seg_33/seg_m_33_t,
+n_seg_34_rv_t  =  seg_34/seg_m_34_t,
+n_seg_35_rv_t  =  seg_35/seg_m_35_t,
+n_seg_36_rv_t  =  seg_36/seg_m_36_t,
+n_seg_37_rv_t  =  seg_37/seg_m_37_t,
+n_seg_38_rv_t  =  seg_38/seg_m_38_t,
+n_seg_39_rv_t  =  seg_39/seg_m_39_t,
+n_seg_40_rv_t  =  seg_40/seg_m_40_t,
+n_seg_41_rv_t  =  seg_41/seg_m_41_t,
 rv_seg_1=seg_1,
 rv_seg_2=seg_2,
 rv_seg_3=seg_3,
@@ -1007,6 +1215,88 @@ n_seg_38_tr  =  seg_38/seg_m_38,
 n_seg_39_tr  =  seg_39/seg_m_39,
 n_seg_40_tr  =  seg_40/seg_m_40,
 n_seg_41_tr  =  seg_41/seg_m_41,
+n_seg_1_tr_t  =  seg_1/seg_m_1_t,
+n_seg_2_tr_t  =  seg_2/seg_m_2_t,
+n_seg_3_tr_t  =  seg_3/seg_m_3_t,
+n_seg_4_tr_t  =  seg_4/seg_m_4_t,
+n_seg_5_tr_t  =  seg_5/seg_m_5_t,
+n_seg_6_tr_t  =  seg_6/seg_m_6_t,
+n_seg_7_tr_t  =  seg_7/seg_m_7_t,
+n_seg_8_tr_t  =  seg_8/seg_m_8_t,
+n_seg_9_tr_t  =  seg_9/seg_m_9_t,
+n_seg_10_tr_t  =  seg_10/seg_m_10_t,
+n_seg_11_tr_t  =  seg_11/seg_m_11_t,
+n_seg_12_tr_t  =  seg_12/seg_m_12_t,
+n_seg_13_tr_t  =  seg_13/seg_m_13_t,
+n_seg_14_tr_t  =  seg_14/seg_m_14_t,
+n_seg_15_tr_t  =  seg_15/seg_m_15_t,
+n_seg_16_tr_t  =  seg_16/seg_m_16_t,
+n_seg_17_tr_t  =  seg_17/seg_m_17_t,
+n_seg_18_tr_t  =  seg_18/seg_m_18_t,
+n_seg_19_tr_t  =  seg_19/seg_m_19_t,
+n_seg_20_tr_t  =  seg_20/seg_m_20_t,
+n_seg_21_tr_t  =  seg_21/seg_m_21_t,
+n_seg_22_tr_t  =  seg_22/seg_m_22_t,
+n_seg_23_tr_t  =  seg_23/seg_m_23_t,
+n_seg_24_tr_t  =  seg_24/seg_m_24_t,
+n_seg_25_tr_t  =  seg_25/seg_m_25_t,
+n_seg_26_tr_t  =  seg_26/seg_m_26_t,
+n_seg_27_tr_t  =  seg_27/seg_m_27_t,
+n_seg_28_tr_t  =  seg_28/seg_m_28_t,
+n_seg_29_tr_t  =  seg_29/seg_m_29_t,
+n_seg_30_tr_t  =  seg_30/seg_m_30_t,
+n_seg_31_tr_t  =  seg_31/seg_m_31_t,
+n_seg_32_tr_t  =  seg_32/seg_m_32_t,
+n_seg_33_tr_t  =  seg_33/seg_m_33_t,
+n_seg_34_tr_t  =  seg_34/seg_m_34_t,
+n_seg_35_tr_t  =  seg_35/seg_m_35_t,
+n_seg_36_tr_t  =  seg_36/seg_m_36_t,
+n_seg_37_tr_t  =  seg_37/seg_m_37_t,
+n_seg_38_tr_t  =  seg_38/seg_m_38_t,
+n_seg_39_tr_t  =  seg_39/seg_m_39_t,
+n_seg_40_tr_t  =  seg_40/seg_m_40_t,
+n_seg_41_tr_t  =  seg_41/seg_m_41_t,
+n_seg_1_tr_t  =  seg_1/seg_m_1_t,
+n_seg_2_tr_t  =  seg_2/seg_m_2_t,
+n_seg_3_tr_t  =  seg_3/seg_m_3_t,
+n_seg_4_tr_t  =  seg_4/seg_m_4_t,
+n_seg_5_tr_t  =  seg_5/seg_m_5_t,
+n_seg_6_tr_t  =  seg_6/seg_m_6_t,
+n_seg_7_tr_t  =  seg_7/seg_m_7_t,
+n_seg_8_tr_t  =  seg_8/seg_m_8_t,
+n_seg_9_tr_t  =  seg_9/seg_m_9_t,
+n_seg_10_tr_t  =  seg_10/seg_m_10_t,
+n_seg_11_tr_t  =  seg_11/seg_m_11_t,
+n_seg_12_tr_t  =  seg_12/seg_m_12_t,
+n_seg_13_tr_t  =  seg_13/seg_m_13_t,
+n_seg_14_tr_t  =  seg_14/seg_m_14_t,
+n_seg_15_tr_t  =  seg_15/seg_m_15_t,
+n_seg_16_tr_t  =  seg_16/seg_m_16_t,
+n_seg_17_tr_t  =  seg_17/seg_m_17_t,
+n_seg_18_tr_t  =  seg_18/seg_m_18_t,
+n_seg_19_tr_t  =  seg_19/seg_m_19_t,
+n_seg_20_tr_t  =  seg_20/seg_m_20_t,
+n_seg_21_tr_t  =  seg_21/seg_m_21_t,
+n_seg_22_tr_t  =  seg_22/seg_m_22_t,
+n_seg_23_tr_t  =  seg_23/seg_m_23_t,
+n_seg_24_tr_t  =  seg_24/seg_m_24_t,
+n_seg_25_tr_t  =  seg_25/seg_m_25_t,
+n_seg_26_tr_t  =  seg_26/seg_m_26_t,
+n_seg_27_tr_t  =  seg_27/seg_m_27_t,
+n_seg_28_tr_t  =  seg_28/seg_m_28_t,
+n_seg_29_tr_t  =  seg_29/seg_m_29_t,
+n_seg_30_tr_t  =  seg_30/seg_m_30_t,
+n_seg_31_tr_t  =  seg_31/seg_m_31_t,
+n_seg_32_tr_t  =  seg_32/seg_m_32_t,
+n_seg_33_tr_t  =  seg_33/seg_m_33_t,
+n_seg_34_tr_t  =  seg_34/seg_m_34_t,
+n_seg_35_tr_t  =  seg_35/seg_m_35_t,
+n_seg_36_tr_t  =  seg_36/seg_m_36_t,
+n_seg_37_tr_t  =  seg_37/seg_m_37_t,
+n_seg_38_tr_t  =  seg_38/seg_m_38_t,
+n_seg_39_tr_t  =  seg_39/seg_m_39_t,
+n_seg_40_tr_t  =  seg_40/seg_m_40_t,
+n_seg_41_tr_t  =  seg_41/seg_m_41_t,
 t_seg_1=seg_1,
 t_seg_2=seg_2,
 t_seg_3=seg_3,
@@ -1055,10 +1345,13 @@ df_month_3_tr[is.num] <- lapply(df_month_3_tr[is.num], round, 0)
 
 
 ```{r}
-### Segment Before Covid 19:
-
+### Segment Before Covid 19 normalized by month of use:
+df_check <- df_month %>% left_join(df_month_t, by="rider") %>% dplyr::select(rider,Creation_Date,first_trip_date,segment_date,starts_with("seg"))  %>% filter(segment_date <= '2020-02',seg_m_31 > 0 ) %>% dplyr::select(rider,seg_m_31_t,seg_m_31) %>% group_by(seg_m_31_t,seg_m_31) %>% summarise(n_rider= n()) %>% spread(seg_m_31_t,n_rider)
+df_check
+df_month_3 <- df_month %>% left_join(df_month_t, by="rider") %>% dplyr::select(rider,Creation_Date,first_trip_date,segment_date,starts_with("seg")) 
+glimpse(df_month_3)
 df_cum <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31 > 0 ) %>% dplyr::select(rider,n_seg_31)%>% 
-                                              arrange(n_seg_31) %>% 
+                                              arrange(desc(n_seg_31)) %>% 
                                               group_by (n_seg_31) %>%
                                               summarise (effective = n()) %>%
                                               mutate (total_effective =sum(effective),rate=                       effective/total_effective,Cum_effective=cumsum(rate)*100)%>%
@@ -1071,27 +1364,39 @@ df_cum <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31 > 0 ) %>% dpl
                                              
                                               geom_hline(yintercept=95, linetype="dashed", color = "black")+
                                              
-                                              labs(x = "# seg_31", y="% Effective" )
-
+                                              labs(x = "segment", y="% Effective" )
 df_cum
+### Send To excel:
+df_cum_excel <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31 > 0 ) %>% dplyr::select(rider,n_seg_31)%>%                                             arrange(desc(n_seg_31)) %>% group_by (n_seg_31) %>%
+                                              summarise (effective = n()) %>%
+                                              mutate (total_effective =sum(effective),rate=                       effective/total_effective,Cum_effective=cumsum(rate)*100)
+write.csv(df_cum_excel,'E:/Git_RStudio_Project/Profiling_rider_202011/Segmentation/df_cum_excel.csv')
 
-```
-
-```{r}
+#  Density Plot
+df_density <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31 > 0 ) %>% dplyr::select(rider,n_seg_31) %>% ggplot( aes(x=n_seg_31)) + 
+  geom_density()
+# Box Plot 
 box_plot_n_seg_31 <- df_month_3 %>% filter(segment_date <= '2020-02') %>% filter(n_seg_31 > 0) %>% dplyr::select(rider,n_seg_31) %>%  ggplot(aes(x = "", y = n_seg_31)) +
    geom_boxplot()+
    scale_y_log10()
-box_plot_n_seg_31
+
 
 box_plot_n_seg_31_s <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31>0) %>% mutate(segment=ifelse(n_seg_31<5000,'Inf_5000','Sup_5000')) %>% dplyr::select(rider,n_seg_31,segment) %>%  ggplot(aes(x = "", y = n_seg_31,color=segment)) +
    geom_boxplot()+
    scale_y_log10()
-box_plot_n_seg_31_s
+
+
+df_cum + df_density + box_plot_n_seg_31 + box_plot_n_seg_31_s
+
+
+
 ```
+
+
 ```{r}
-df_month_3
+## Segmentation by the normalized of mOnth used
 ### Agregation 
-segment_12_01_02_over_all_agregation <- df_month_3 %>% filter(segment_date <= '2020-02') %>% dplyr::select(n_seg_31) %>% mutate(segment=ifelse(n_seg_31 <= 0,'Dormant',ifelse(n_seg_31<=12500,'Inf_5000','Sup_5000'))) %>% group_by(segment) %>% summarise(riders= n()) %>% mutate(ttl_rider=sum(riders),percentage= riders/ttl_rider*100) %>% arrange(desc(ttl_rider))
+segment_12_01_02_over_all_agregation <- df_month_3 %>% filter(segment_date <= '2020-02') %>% dplyr::select(n_seg_31) %>% mutate(segment=ifelse(n_seg_31 <= 0,'Dormant',ifelse(n_seg_31<=5000,'Inf_5000','Sup_5000'))) %>% group_by(segment) %>% summarise(riders= n()) %>% mutate(ttl_rider=sum(riders),percentage= riders/ttl_rider*100) %>% arrange(desc(ttl_rider))
 segment_12_01_02_over_all_agregation
 #### Over All 
 segment_12_01_02_over_all <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31>0) %>% dplyr::select(n_seg_31)
@@ -1100,10 +1405,15 @@ segment_12_01_02_over_all <- df_month_3 %>% filter(segment_date <= '2020-02',n_s
 segment_12_01_02_inf_5000 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31>0) %>% mutate(segment=ifelse(n_seg_31<=5000,'Inf_5000','Sup_5000')) %>% filter(segment =='Inf_5000') %>% dplyr::select(n_seg_31)
 #### Sup_5000
 segment_12_01_02_sup_5000 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31>0) %>% mutate(segment=ifelse(n_seg_31<=5000,'Inf_5000','Sup_5000')) %>% filter(segment =='Sup_5000') %>% dplyr::select(n_seg_31)
+
+```
+
+
+```{r}
 ## Kmeans Alorythm details segment_12_01_02_inf_12500
 set.seed(123)
 
-input_M3 <- as.data.frame(segment_12_01_02_inf_5000)
+input_M3 <- as.data.frame(segment_12_01_02_over_all)
 wssplot <- function(data, nc=15, seed=123){
   wss <- (nrow(data)-1)*sum(apply(data,2,var))
   for (i in 2:nc){
@@ -1113,36 +1423,130 @@ wssplot <- function(data, nc=15, seed=123){
        ylab="Sum of squares within a group")}
 
 Segment_over_all <-wssplot(input_M3, nc = 20)
-
+Segment_over_all
 clustering_M3 <- kmeans(input_M3, centers = 5, nstart = 20)
-clustering_M3
-aggregate(input_M3,by=list(clustering_M3$cluster),FUN=min)
-aggregate(input_M3,by=list(clustering_M3$cluster),FUN=mean)
-aggregate(input_M3,by=list(clustering_M3$cluster),FUN=max)
-aggregate(input_M3,by=list(clustering_M3$cluster),FUN=sd)
 
-## Kmeans Alorythm details segment_12_01_02_sup_12500
-set.seed(123)
+min_cluster <- aggregate(input_M3,by=list(clustering_M3$cluster),FUN=min)
+names(min_cluster)[names(min_cluster) == "n_seg_31"] <- "min_cluster"
+d <- as.data.frame(clustering_M3$cluster)
+names(d )[names(d ) == "cluster6"] <- "cluster6"
+count_cluster
+count_cluster <- d %>% group_by(count_cluster) %>% summarise(count_cluster1=n())
+names(mean_cluster)[names(mean_cluster) == "n_seg_31"] <- "mean_cluster"
+mean_cluster <- aggregate(input_M3,by=list(clustering_M3$cluster),FUN=mean)
+names(mean_cluster)[names(mean_cluster) == "n_seg_31"] <- "mean_cluster"
+names(mean_cluster)[names(mean_cluster) == "Group.1"] <- "cluster2"
+median_cluster <- aggregate(input_M3,by=list(clustering_M3$cluster),FUN=median)
+names(median_cluster)[names(median_cluster) == "n_seg_31"] <- "median_cluster"
+names(median_cluster)[names(median_cluster) == "Group.1"] <- "cluster5"
+max_cluster <- aggregate(input_M3,by=list(clustering_M3$cluster),FUN=max)
+names(max_cluster)[names(max_cluster) == "n_seg_31"] <- "max_cluster"
+names(max_cluster)[names(max_cluster) == "Group.1"] <- "cluster3"
+sd_cluster <- aggregate(input_M3,by=list(clustering_M3$cluster),FUN=sd)
+names(sd_cluster)[names(sd_cluster) == "n_seg_31"] <- "sd_cluster"
+names(sd_cluster)[names(sd_cluster) == "Group.1"] <- "cluster4"
 
-input_M3 <- as.data.frame(segment_12_01_02_sup_5000)
-wssplot <- function(data, nc=15, seed=123){
-  wss <- (nrow(data)-1)*sum(apply(data,2,var))
-  for (i in 2:nc){
-    set.seed(seed)
-    wss[i] <- sum(kmeans(data, centers=i)$withinss)}
-  plot(1:nc, wss, type="b", xlab="Number of groups",
-       ylab="Sum of squares within a group")}
-
-Segment_over_all <-wssplot(input_M3, nc = 20)
-
-clustering_M3 <- kmeans(input_M3, centers = 5, nstart = 20)
-clustering_M3
-aggregate(input_M3,by=list(clustering_M3$cluster),FUN=min)
-aggregate(input_M3,by=list(clustering_M3$cluster),FUN=mean)
-aggregate(input_M3,by=list(clustering_M3$cluster),FUN=max)
-aggregate(input_M3,by=list(clustering_M3$cluster),FUN=sd)
+ summary_stat_cluster <- cbind(min_cluster,mean_cluster,median_cluster,max_cluster,sd_cluster,count_cluster) %>% dplyr::select(cluster,min_cluster,mean_cluster,median_cluster,max_cluster,sd_cluster,count_cluster1) %>% mutate(Variation_coef=sd_cluster/mean_cluster) %>% arrange(min_cluster)
+ summary_stat_cluster
+ glimpse(clustering_M3)
+ 
+write.csv(summary_stat_cluster,'E:/Git_RStudio_Project/Profiling_rider_202011/Segmentation/summary_stat_cluster.csv')
 
 ```
+
+
+```{r}
+### Segment Before Covid 19 normalized by age:
+
+df_cum_1 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31_t > 0 ) %>% dplyr::select(rider,n_seg_31_t)%>% 
+                                              arrange(n_seg_31_t) %>% 
+                                              group_by (n_seg_31_t) %>%
+                                              summarise (effective = n()) %>%
+                                              mutate (total_effective =sum(effective),rate=                       effective/total_effective,Cum_effective=cumsum(rate)*100)%>%
+                                             
+                                              
+                                              ggplot(aes(n_seg_31_t,Cum_effective))+
+                                              geom_line(color = "red")+
+                                              geom_line(color = "red")+
+                                              geom_vline(xintercept=1600, linetype="dashed", color = "black")+
+                                             
+                                              geom_hline(yintercept=95, linetype="dashed", color = "black")+
+                                             
+                                              labs(x = "# seg_31", y="% Effective" )
+
+# Kernel Density Plot
+df_density1 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31_t > 0 ) %>% dplyr::select(rider,n_seg_31_t) %>% ggplot( aes(x=n_seg_31_t)) + 
+  geom_density()
+
+# Box Plot 
+box_plot_n_seg_31_1 <- df_month_3 %>% filter(segment_date <= '2020-02') %>% filter(n_seg_31_t>0) %>% dplyr::select(rider,n_seg_31_t) %>%  ggplot(aes(x = "", y = n_seg_31_t)) +
+   geom_boxplot()+
+   scale_y_log10()
+
+
+box_plot_n_seg_31_s_1 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31_t>0) %>% mutate(segment=ifelse(n_seg_31_t<1600,'Inf_1600','Sup_1600')) %>% dplyr::select(rider,n_seg_31_t,segment) %>%  ggplot(aes(x = "", y = n_seg_31_t,color=segment)) +
+   geom_boxplot()+
+   scale_y_log10()
+
+df_cum_1 + df_density1 +box_plot_n_seg_31_1+box_plot_n_seg_31_s_1
+
+```
+
+
+
+```{r}
+## Segmentation by the normalized of age mont
+### Agregation 
+segment_12_01_02_over_all_agregation <- df_month_3 %>% filter(segment_date <= '2020-02') %>% dplyr::select(n_seg_31_t) %>% mutate(segment=ifelse(n_seg_31_t <= 0,'Dormant',ifelse(n_seg_31_t<=1600,'Inf_1600','Sup_1600'))) %>% group_by(segment) %>% summarise(riders= n()) %>% mutate(ttl_rider=sum(riders),percentage= riders/ttl_rider*100) %>% arrange(desc(ttl_rider))
+segment_12_01_02_over_all_agregation
+#### Over All 
+segment_12_01_02_over_all_1 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31_t>0) %>% dplyr::select(n_seg_31_t)
+
+#### Inf_1600
+segment_12_01_02_inf_1600 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31_t>0) %>% mutate(segment=ifelse(n_seg_31_t<=1600,'Inf_51600','Sup_1600')) %>% filter(segment =='Inf_1600') %>% dplyr::select(n_seg_31_t)
+#### Sup_1600
+segment_12_01_02_sup_1600 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31_t>0) %>% mutate(segment=ifelse(n_seg_31_t<=1600,'Inf_1600','Sup_1600')) %>% filter(segment =='Sup_1600') %>% dplyr::select(n_seg_31_t)
+```
+
+
+```{r}
+## Kmeans Alorythm details segment_12_01_02_inf_12500
+set.seed(123)
+
+input_M3 <- as.data.frame(segment_12_01_02_over_all_1)
+wssplot <- function(data, nc=15, seed=123){
+  wss <- (nrow(data)-1)*sum(apply(data,2,var))
+  for (i in 2:nc){
+    set.seed(seed)
+    wss[i] <- sum(kmeans(data, centers=i)$withinss)}
+  plot(1:nc, wss, type="b", xlab="Number of groups",
+       ylab="Sum of squares within a group")}
+
+Segment_over_all <-wssplot(input_M3, nc = 20)
+
+clustering_M3 <- kmeans(input_M3, centers = 5, nstart = 20)
+min_cluster <- aggregate(input_M3,by=list(clustering_M3$cluster),FUN=min)
+names(min_cluster)[names(min_cluster) == "n_seg_31_t"] <- "min_cluster"
+names(min_cluster)[names(min_cluster) == "Group.1"] <- "cluster"
+mean_cluster <- aggregate(input_M3,by=list(clustering_M3$cluster),FUN=mean)
+names(mean_cluster)[names(mean_cluster) == "n_seg_31_t"] <- "mean_cluster"
+names(mean_cluster)[names(mean_cluster) == "Group.1"] <- "cluster2"
+median_cluster <- aggregate(input_M3,by=list(clustering_M3$cluster),FUN=median)
+names(median_cluster)[names(median_cluster) == "n_seg_31_t"] <- "median_cluster"
+names(median_cluster)[names(median_cluster) == "Group.1"] <- "cluster5"
+max_cluster <- aggregate(input_M3,by=list(clustering_M3$cluster),FUN=max)
+names(max_cluster)[names(max_cluster) == "n_seg_31_t"] <- "max_cluster"
+names(max_cluster)[names(max_cluster) == "Group.1"] <- "cluster3"
+sd_cluster <- aggregate(input_M3,by=list(clustering_M3$cluster),FUN=sd)
+names(sd_cluster)[names(sd_cluster) == "n_seg_31_t"] <- "sd_cluster"
+names(sd_cluster)[names(sd_cluster) == "Group.1"] <- "cluster4"
+
+summary_stat_cluster <- cbind(min_cluster,mean_cluster,median_cluster,max_cluster,sd_cluster) %>% dplyr::select(cluster,min_cluster,mean_cluster,median_cluster,max_cluster,sd_cluster) %>% mutate(Variation_coef=sd_cluster/mean_cluster) %>% arrange(min_cluster)
+ summary_stat_cluster
+ 
+
+```
+
 
 ```{r}
 

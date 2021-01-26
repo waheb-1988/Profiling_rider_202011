@@ -1406,8 +1406,6 @@ segment_12_01_02_inf_5000 <- df_month_3 %>% filter(segment_date <= '2020-02',n_s
 #### Sup_5000
 segment_12_01_02_sup_5000 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31>0) %>% mutate(segment=ifelse(n_seg_31<=5000,'Inf_5000','Sup_5000')) %>% filter(segment =='Sup_5000') %>% dplyr::select(n_seg_31)
 
-```
-
 
 ```{r}
 ## Kmeans Alorythm details segment_12_01_02_inf_12500
@@ -1456,6 +1454,169 @@ write.csv(summary_stat_cluster,'E:/Git_RStudio_Project/Profiling_rider_202011/Se
 
 
 ```{r}
+## segment limit
+min_0 <- 0
+Min_1 <- 1208 
+Min_2 <- 2744
+Min_3 <- 5474
+Min_4 <- 10810
+
+#### 1
+
+df_month_5_1 <- df_month_3  %>%  mutate(flag_login_1= ifelse((Creation_Date <= '2017-08-31' & Creation_Date >= '2017-01-01') & (first_trip_date <= '2017-08-31' & first_trip_date >= '2017-01-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-01-01') & (first_trip_date <= '2017-08-31' & first_trip_date >= '2017-01-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2017-08-31' & first_trip_date > '2017-08-31'),"",'BASE'))),segment_value_n_seg_1=ifelse( n_seg_1 <= 0 ,"Inactive",ifelse( n_seg_1> min_0 & n_seg_1<  Min_1,"very_low",ifelse(n_seg_1>= Min_1 & n_seg_1 <  Min_2,"low",ifelse(n_seg_1>= Min_2 & n_seg_1<  Min_3, "mid",ifelse(n_seg_1>= Min_3 & n_seg_1 <Min_4, "high","very_high"))))), final_segment_1 = ifelse(flag_login_1=="","", paste(flag_login_1,segment_value_n_seg_1,sep = '_')))
+
+
+#### 2
+ 
+seg <- 'n_seg_2'
+df_month_5_2 <- df_month_5_1  %>%  mutate(flag_login_2= ifelse((Creation_Date <= '2017-09-30' & Creation_Date >= '2017-07-01') & (first_trip_date <= '2017-09-30' & first_trip_date >= '2017-07-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-07-01') & (first_trip_date <= '2017-09-30' & first_trip_date >= '2017-07-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2017-09-30' & first_trip_date > '2017-09-30'),"",'BASE'))),segment_value_n_seg_2=ifelse( n_seg_2 <= 0 ,"Inactive",ifelse( n_seg_2> min_0 & n_seg_2<  Min_1,"very_low",ifelse(n_seg_2>= Min_1 & n_seg_2 <  Min_2,"low",ifelse(n_seg_2>= Min_2 & n_seg_2<  Min_3, "mid",ifelse(n_seg_2>= Min_3 & n_seg_2 <Min_4, "high","very_high"))))), final_segment_2 = ifelse(flag_login_2=="","", paste(flag_login_2,segment_value_n_seg_2,sep = '_')))
+#### 3
+ 
+
+df_month_5_3 <- df_month_5_2 %>%  mutate(flag_login_3= ifelse((Creation_Date <= '2017-10-31' & Creation_Date >= '2017-08-01') & (first_trip_date <= '2017-10-31' & first_trip_date >= '2017-08-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-08-01') & (first_trip_date <= '2017-10-31' & first_trip_date >= '2017-10-31' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-11-30' & first_trip_date > '2017-10-31'),"",'BASE'))),segment_value_n_seg_3=ifelse( n_seg_3 <= 0 ,"Inactive",ifelse( n_seg_3> min_0 & n_seg_3<  Min_1,"very_low",ifelse(n_seg_3>= Min_1 & n_seg_3 <  Min_2,"low",ifelse(n_seg_3>= Min_2 & n_seg_3<  Min_3, "mid",ifelse(n_seg_3>= Min_3 & n_seg_3 <Min_4, "high","very_high"))))), final_segment_3 = ifelse(flag_login_3=="","", paste(flag_login_3,segment_value_n_seg_3,sep = '_')))
+#### 4
+
+df_month_5_4 <- df_month_5_3  %>%  mutate(flag_login_4= ifelse((Creation_Date <= '2017-11-30' & Creation_Date >= '2017-09-01') & (first_trip_date <= '2017-11-30' & first_trip_date >= '2017-09-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-09-01') & (first_trip_date <= '2017-11-30' & first_trip_date >= '2017-09-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2017-11-30' & first_trip_date > '2017-11-30'),"",'BASE'))),segment_value_n_seg_4=ifelse( n_seg_4 <= 0 ,"Inactive",ifelse( n_seg_4> min_0 & n_seg_1<  Min_1,"very_low",ifelse(n_seg_4>= Min_1 & n_seg_4 <  Min_2,"low",ifelse(n_seg_4>= Min_2 & n_seg_4<  Min_3, "mid",ifelse(n_seg_4>= Min_3 & n_seg_4 <Min_4, "high","very_high"))))), final_segment_4 = ifelse(flag_login_4=="","", paste(flag_login_4,segment_value_n_seg_4,sep = '_')))
+#### 5
+
+df_month_5_5 <- df_month_5_4  %>%  mutate(flag_login_5= ifelse((Creation_Date <= '2017-12-31' & Creation_Date >= '2017-10-01') & (first_trip_date <= '2017-12-31' & first_trip_date >= '2017-10-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-10-01') & (first_trip_date <= '2017-12-31' & first_trip_date >= '2017-10-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2017-12-31'& first_trip_date > '2017-12-31'),"",'BASE'))),segment_value_n_seg_5=ifelse( n_seg_5 <= 0 ,"Inactive",ifelse( n_seg_5> min_0 & n_seg_5<  Min_1,"very_low",ifelse(n_seg_5>= Min_1 & n_seg_5 <  Min_2,"low",ifelse(n_seg_5>= Min_2 & n_seg_5<  Min_3, "mid",ifelse(n_seg_5>= Min_3 & n_seg_5 <Min_4, "high","very_high"))))), final_segment_5 = ifelse(flag_login_5=="","", paste(flag_login_5,segment_value_n_seg_5,sep = '_')))
+#### 6
+
+df_month_5_6 <- df_month_5_5  %>%  mutate(flag_login_6= ifelse((Creation_Date <= '2018-01-31' & Creation_Date >= '2017-11-01') & (first_trip_date <= '2018-01-31' & first_trip_date >= '2017-11-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-11-01') & (first_trip_date <= '2018-01-31' & first_trip_date >= '2017-11-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-01-31' & first_trip_date > '2018-01-31'),"",'BASE'))),segment_value_n_seg_6=ifelse( n_seg_6 <= 0 ,"Inactive",ifelse( n_seg_6> min_0 & n_seg_6<  Min_1,"very_low",ifelse(n_seg_6>= Min_1 & n_seg_6 <  Min_2,"low",ifelse(n_seg_6>= Min_2 & n_seg_6<  Min_3, "mid",ifelse(n_seg_6>= Min_3 & n_seg_6 <Min_4, "high","very_high"))))), final_segment_6 = ifelse(flag_login_6=="","", paste(flag_login_6,segment_value_n_seg_6,sep = '_')))
+#### 7
+
+df_month_5_7 <- df_month_5_6  %>%  mutate(flag_login_7= ifelse((Creation_Date <= '2018-02-28' & Creation_Date >= '2017-12-01') & (first_trip_date <= '2018-02-28' & first_trip_date >= '2017-12-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2017-12-01') & (first_trip_date <= '2018-02-28' & first_trip_date >= '2017-12-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-02-28' & first_trip_date > '2018-02-28'),"",'BASE'))),segment_value_n_seg_7=ifelse( n_seg_7 <= 0 ,"Inactive",ifelse( n_seg_7> min_0 & n_seg_7<  Min_1,"very_low",ifelse(n_seg_7>= Min_1 & n_seg_7 <  Min_2,"low",ifelse(n_seg_7>= Min_2 & n_seg_7<  Min_3, "mid",ifelse(n_seg_7>= Min_3 & n_seg_7 <Min_4, "high","very_high"))))), final_segment_7 = ifelse(flag_login_7=="","", paste(flag_login_7,segment_value_n_seg_7,sep = '_')))
+#### 8
+
+df_month_5_8 <- df_month_5_7  %>%  mutate(flag_login_8= ifelse((Creation_Date <= '2018-03-31' & Creation_Date >= '2018-01-01') & (first_trip_date <= '2018-03-31'& first_trip_date >= '2018-01-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-01-01') & (first_trip_date <= '2018-03-31' & first_trip_date >= '2018-01-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-03-31' & first_trip_date > '2018-03-31'),"",'BASE'))),segment_value_n_seg_8=ifelse( n_seg_8 <= 0 ,"Inactive",ifelse( n_seg_8> min_0 & n_seg_8<  Min_1,"very_low",ifelse(n_seg_8>= Min_1 & n_seg_8 <  Min_2,"low",ifelse(n_seg_8>= Min_2 & n_seg_8<  Min_3, "mid",ifelse(n_seg_8>= Min_3 & n_seg_8 <Min_4, "high","very_high"))))), final_segment_8 = ifelse(flag_login_8=="","", paste(flag_login_8,segment_value_n_seg_8,sep = '_')))
+#### 9
+
+df_month_5_9 <- df_month_5_8  %>%  mutate(flag_login_9= ifelse((Creation_Date <= '2018-04-30' & Creation_Date >= '2018-02-01') & (first_trip_date <= '2018-04-30'& first_trip_date >='2018-02-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-02-01') & (first_trip_date <= '2018-04-30' & first_trip_date >= '2018-02-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-04-30' & first_trip_date > '2018-04-30'),"",'BASE'))),segment_value_n_seg_9=ifelse( n_seg_9 <= 0 ,"Inactive",ifelse( n_seg_9> min_0 & n_seg_9<  Min_1,"very_low",ifelse(n_seg_9>= Min_1 & n_seg_9 <  Min_2,"low",ifelse(n_seg_9>= Min_2 & n_seg_9<  Min_3, "mid",ifelse(n_seg_9>= Min_3 & n_seg_9 <Min_4, "high","very_high"))))), final_segment_9 = ifelse(flag_login_9=="","", paste(flag_login_9,segment_value_n_seg_9,sep = '_')))
+#### 10
+
+df_month_5_10 <- df_month_5_9  %>%  mutate(flag_login_10= ifelse((Creation_Date <= '2018-05-31' & Creation_Date >= '2018-03-01') & (first_trip_date <=  '2018-05-31' & first_trip_date >='2018-03-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-03-01') & (first_trip_date <= '2018-05-31' & first_trip_date >= '2018-03-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-05-31' & first_trip_date > '2018-05-31'),"",'BASE'))),segment_value_n_seg_10=ifelse( n_seg_10 <= 0 ,"Inactive",ifelse( n_seg_10> min_0 & n_seg_10<  Min_1,"very_low",ifelse(n_seg_10>= Min_1 & n_seg_10 <  Min_2,"low",ifelse(n_seg_10>= Min_2 & n_seg_10<  Min_3, "mid",ifelse(n_seg_10>= Min_3 & n_seg_10 <Min_4, "high","very_high"))))), final_segment_10 = ifelse(flag_login_10=="","", paste(flag_login_10,segment_value_n_seg_10,sep = '_')))
+#### 11
+
+df_month_5_11 <- df_month_5_10  %>%  mutate(flag_login_11= ifelse((Creation_Date <= '2018-06-30' & Creation_Date >= '2018-04-01') & (first_trip_date <=  '2018-06-30' & first_trip_date >='2018-04-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-04-01') & (first_trip_date <= '2018-06-30' & first_trip_date >= '2018-04-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-06-30' & first_trip_date > '2018-06-30'),"",'BASE'))),segment_value_n_seg_11=ifelse( n_seg_11 <= 0 ,"Inactive",ifelse( n_seg_11> min_0 & n_seg_11<  Min_1,"very_low",ifelse(n_seg_11>= Min_1 & n_seg_11 <  Min_2,"low",ifelse(n_seg_11>= Min_2 & n_seg_11<  Min_3, "mid",ifelse(n_seg_11>= Min_3 & n_seg_11 <Min_4, "high","very_high"))))), final_segment_11 = ifelse(flag_login_11=="","", paste(flag_login_11,segment_value_n_seg_11,sep = '_')))
+#### 12
+
+df_month_5_12 <- df_month_5_11  %>%  mutate(flag_login_12= ifelse((Creation_Date <= '2018-07-31' & Creation_Date >= '2018-05-01') & (first_trip_date <=  '2018-07-31' & first_trip_date >='2018-05-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-05-01') & (first_trip_date <= '2018-07-31' & first_trip_date >= '2018-05-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-07-31' & first_trip_date > '2018-07-31'),"",'BASE'))),segment_value_n_seg_12=ifelse( n_seg_12 <= 0 ,"Inactive",ifelse( n_seg_12> min_0 & n_seg_12<  Min_1,"very_low",ifelse(n_seg_12>= Min_1 & n_seg_12 <  Min_2,"low",ifelse(n_seg_12>= Min_2 & n_seg_12<  Min_3, "mid",ifelse(n_seg_12>= Min_3 & n_seg_12 <Min_4, "high","very_high"))))), final_segment_12 = ifelse(flag_login_12=="","", paste(flag_login_12,segment_value_n_seg_12,sep = '_')))
+#### 13
+
+df_month_5_13 <- df_month_5_12  %>%  mutate(flag_login_13= ifelse((Creation_Date <='2018-08-31' & Creation_Date >= '2018-06-01') & (first_trip_date <=  '2018-08-31' & first_trip_date >='2018-06-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-06-01') & (first_trip_date <= '2018-08-31' & first_trip_date >= '2018-06-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-08-31' & first_trip_date > '2018-08-31'),"",'BASE'))),segment_value_n_seg_13=ifelse( n_seg_13 <= 0 ,"Inactive",ifelse( n_seg_13> min_0 & n_seg_13<  Min_1,"very_low",ifelse(n_seg_13>= Min_1 & n_seg_13 <  Min_2,"low",ifelse(n_seg_13>= Min_2 & n_seg_13<  Min_3, "mid",ifelse(n_seg_13>= Min_3 & n_seg_13 <Min_4, "high","very_high"))))), final_segment_13 = ifelse(flag_login_13=="","", paste(flag_login_13,segment_value_n_seg_13,sep = '_')))
+#### 14
+
+df_month_5_14 <- df_month_5_13  %>%  mutate(flag_login_14= ifelse((Creation_Date <='2018-09-30' & Creation_Date >= '2018-07-01') & (first_trip_date <=  '2018-09-30' & first_trip_date >='2018-07-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-07-01') & (first_trip_date <= '2018-09-30' & first_trip_date >= '2018-07-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-09-30' & first_trip_date > '2018-09-30'),"",'BASE'))),segment_value_n_seg_14=ifelse( n_seg_14 <= 0 ,"Inactive",ifelse( n_seg_14> min_0 & n_seg_14<  Min_1,"very_low",ifelse(n_seg_14>= Min_1 & n_seg_14 <  Min_2,"low",ifelse(n_seg_14>= Min_2 & n_seg_14<  Min_3, "mid",ifelse(n_seg_14>= Min_3 & n_seg_14 <Min_4, "high","very_high"))))), final_segment_14 = ifelse(flag_login_14=="","", paste(flag_login_14,segment_value_n_seg_14,sep = '_')))
+#### 15
+
+df_month_5_15 <- df_month_5_14  %>%  mutate(flag_login_15= ifelse((Creation_Date <='2018-10-31' & Creation_Date >= '2018-08-01') & (first_trip_date <=  '2018-10-31' & first_trip_date >='2018-08-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-08-01') & (first_trip_date <= '2018-10-31' & first_trip_date >= '2018-08-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-10-31' & first_trip_date > '2018-10-31'),"",'BASE'))),segment_value_n_seg_15=ifelse( n_seg_15 <= 0 ,"Inactive",ifelse( n_seg_15> min_0 & n_seg_15<  Min_1,"very_low",ifelse(n_seg_15>= Min_1 & n_seg_15 <  Min_2,"low",ifelse(n_seg_15>= Min_2 & n_seg_15<  Min_3, "mid",ifelse(n_seg_15>= Min_3 & n_seg_15 <Min_4, "high","very_high"))))), final_segment_15 = ifelse(flag_login_15=="","", paste(flag_login_15,segment_value_n_seg_15,sep = '_')))
+#### 16
+
+df_month_5_16 <- df_month_5_15  %>%  mutate(flag_login_16= ifelse((Creation_Date <='2018-11-30' & Creation_Date >= '2018-09-01') & (first_trip_date <=  '2018-11-30' & first_trip_date >='2018-09-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-09-01') & (first_trip_date <= '2018-11-30' & first_trip_date >= '2018-09-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-11-30' & first_trip_date > '2018-11-30'),"",'BASE'))),segment_value_n_seg_16=ifelse( n_seg_16 <= 0 ,"Inactive",ifelse( n_seg_16> min_0 & n_seg_16<  Min_1,"very_low",ifelse(n_seg_16>= Min_1 & n_seg_16 <  Min_2,"low",ifelse(n_seg_16>= Min_2 & n_seg_16<  Min_3, "mid",ifelse(n_seg_16>= Min_3 & n_seg_16 <Min_4, "high","very_high"))))), final_segment_16 = ifelse(flag_login_16=="","", paste(flag_login_16,segment_value_n_seg_16,sep = '_')))
+#### 17
+
+df_month_5_17 <- df_month_5_16  %>%  mutate(flag_login_17= ifelse((Creation_Date <='2018-12-31' & Creation_Date >= '2018-10-01') & (first_trip_date <=  '2018-12-31' & first_trip_date >='2018-10-01') ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-10-01') & (first_trip_date <= '2018-12-31' & first_trip_date >= '2018-10-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2018-12-31' & first_trip_date > '2018-12-31'),"",'BASE'))),segment_value_n_seg_17=ifelse( n_seg_17 <= 0 ,"Inactive",ifelse( n_seg_17> min_0 & n_seg_17<  Min_1,"very_low",ifelse(n_seg_17>= Min_1 & n_seg_17 <  Min_2,"low",ifelse(n_seg_17>= Min_2 & n_seg_17<  Min_3, "mid",ifelse(n_seg_17>= Min_3 & n_seg_17 <Min_4, "high","very_high"))))), final_segment_17 = ifelse(flag_login_17=="","", paste(flag_login_17,segment_value_n_seg_17,sep = '_')))
+#### 18
+df_month_5_18 <- df_month_5_17  %>%  mutate(flag_login_18= ifelse((Creation_Date <= '2019-01-31' & Creation_Date >='2018-11-01' ) & (first_trip_date <=   '2019-01-31' & first_trip_date >='2018-11-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-11-01' ) & (first_trip_date <=  '2019-01-31' & first_trip_date >= '2018-11-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-01-31' & first_trip_date > '2019-01-31'),"",'BASE'))),segment_value_n_seg_18=ifelse( n_seg_18 <= 0 ,"Inactive",ifelse( n_seg_18> min_0 & n_seg_18<  Min_1,"very_low",ifelse(n_seg_18>= Min_1 & n_seg_18 <  Min_2,"low",ifelse(n_seg_18>= Min_2 & n_seg_10<  Min_3, "mid",ifelse(n_seg_18>= Min_3 & n_seg_18 <Min_4, "high","very_high"))))), final_segment_18 = ifelse(flag_login_18=="","", paste(flag_login_18,segment_value_n_seg_18,sep = '_')))
+#### 19
+
+df_month_5_19 <- df_month_5_18  %>%  mutate(flag_login_19= ifelse((Creation_Date <= '2019-02-28' & Creation_Date >='2018-12-01' ) & (first_trip_date <=   '2019-02-28' & first_trip_date >='2018-12-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2018-12-01' ) & (first_trip_date <=  '2019-02-28' & first_trip_date >= '2018-12-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-02-28' & first_trip_date > '2019-02-28'),"",'BASE'))),segment_value_n_seg_19=ifelse( n_seg_19 <= 0 ,"Inactive",ifelse( n_seg_19> min_0 & n_seg_19<  Min_1,"very_low",ifelse(n_seg_19>= Min_1 & n_seg_19 <  Min_2,"low",ifelse(n_seg_19>= Min_2 & n_seg_19<  Min_3, "mid",ifelse(n_seg_19>= Min_3 & n_seg_19 <Min_4, "high","very_high"))))), final_segment_19 = ifelse(flag_login_19=="","", paste(flag_login_19,segment_value_n_seg_19,sep = '_')))
+#### 20
+
+df_month_5_20 <- df_month_5_19 %>%  mutate(flag_login_20= ifelse((Creation_Date <= '2019-03-31' & Creation_Date >='2019-01-01'  ) & (first_trip_date <=   '2019-03-31' & first_trip_date >='2019-01-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-01-01'  ) & (first_trip_date <=  '2019-03-31' & first_trip_date >= '2019-01-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-03-31' & first_trip_date > '2019-03-31'),"",'BASE'))),segment_value_n_seg_20=ifelse( n_seg_20 <= 0 ,"Inactive",ifelse( n_seg_20> min_0 & n_seg_20<  Min_1,"very_low",ifelse(n_seg_20>= Min_1 & n_seg_20 <  Min_2,"low",ifelse(n_seg_20>= Min_2 & n_seg_20<  Min_3, "mid",ifelse(n_seg_20>= Min_3 & n_seg_20 <Min_4, "high","very_high"))))), final_segment_20 = ifelse(flag_login_20=="","", paste(flag_login_20,segment_value_n_seg_20,sep = '_')))
+#### 21
+
+df_month_5_21 <- df_month_5_20  %>%  mutate(flag_login_21= ifelse((Creation_Date <= '2019-04-30' & Creation_Date >= '2019-02-01'  ) & (first_trip_date <=   '2019-04-30' & first_trip_date >='2019-02-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-02-01'  ) & (first_trip_date <=  '2019-04-30' & first_trip_date >= '2019-02-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-04-30' & first_trip_date > '2019-04-30'),"",'BASE'))),segment_value_n_seg_21=ifelse( n_seg_21 <= 0 ,"Inactive",ifelse( n_seg_21> min_0 & n_seg_21<  Min_1,"very_low",ifelse(n_seg_21>= Min_1 & n_seg_21 <  Min_2,"low",ifelse(n_seg_21>= Min_2 & n_seg_21<  Min_3, "mid",ifelse(n_seg_21>= Min_3 & n_seg_21 <Min_4, "high","very_high"))))), final_segment_21 = ifelse(flag_login_21=="","", paste(flag_login_21,segment_value_n_seg_21,sep = '_')))
+#### 22
+
+df_month_5_22 <- df_month_5_21  %>%  mutate(flag_login_22= ifelse((Creation_Date <= '2019-05-31' & Creation_Date >= '2019-03-01'  ) & (first_trip_date <= '2019-05-31' & first_trip_date >='2019-03-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <='2019-03-01'  ) & (first_trip_date <=  '2019-05-31' & first_trip_date >= '2019-03-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-05-31' & first_trip_date > '2019-05-31'),"",'BASE'))),segment_value_n_seg_22=ifelse( n_seg_22 <= 0 ,"Inactive",ifelse( n_seg_22> min_0 & n_seg_22<  Min_1,"very_low",ifelse(n_seg_22>= Min_1 & n_seg_22 <  Min_2,"low",ifelse(n_seg_22>= Min_2 & n_seg_22<  Min_3, "mid",ifelse(n_seg_22>= Min_3 & n_seg_22 <Min_4, "high","very_high"))))), final_segment_22 = ifelse(flag_login_22=="","", paste(flag_login_22,segment_value_n_seg_22,sep = '_')))
+#### 23
+
+df_month_5_23 <- df_month_5_22  %>%  mutate(flag_login_23= ifelse((Creation_Date <= '2019-06-30' & Creation_Date >=  '2019-04-01'  ) & (first_trip_date <= '2019-06-30' & first_trip_date >= '2019-04-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-04-01'  ) & (first_trip_date <=  '2019-06-30' & first_trip_date >=  '2019-04-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-06-30' & first_trip_date > '2019-06-30'),"",'BASE'))),segment_value_n_seg_23=ifelse( n_seg_23 <= 0 ,"Inactive",ifelse( n_seg_23> min_0 & n_seg_23<  Min_1,"very_low",ifelse(n_seg_23>= Min_1 & n_seg_23 <  Min_2,"low",ifelse(n_seg_23>= Min_2 & n_seg_23<  Min_3, "mid",ifelse(n_seg_23>= Min_3 & n_seg_23 <Min_4, "high","very_high"))))), final_segment_23 = ifelse(flag_login_23=="","", paste(flag_login_23,segment_value_n_seg_23,sep = '_')))
+#### 24
+
+df_month_5_24 <- df_month_5_23 %>%  mutate(flag_login_24= ifelse((Creation_Date <= '2019-07-31' & Creation_Date >=  '2019-05-01'  ) & (first_trip_date <=  '2019-07-31' & first_trip_date >= '2019-05-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-05-01'  ) & (first_trip_date <=   '2019-07-31' & first_trip_date >= '2019-05-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-07-31' & first_trip_date > '2019-07-31'),"",'BASE'))),segment_value_n_seg_24=ifelse( n_seg_24 <= 0 ,"Inactive",ifelse( n_seg_24> min_0 & n_seg_24<  Min_1,"very_low",ifelse(n_seg_24>= Min_1 & n_seg_24 <  Min_2,"low",ifelse(n_seg_24>= Min_2 & n_seg_24<  Min_3, "mid",ifelse(n_seg_24>= Min_3 & n_seg_24 <Min_4, "high","very_high"))))), final_segment_24 = ifelse(flag_login_24=="","", paste(flag_login_24,segment_value_n_seg_24,sep = '_')))
+#### 25
+
+df_month_5_25 <- df_month_5_24 %>%   mutate(flag_login_25= ifelse((Creation_Date <= '2019-08-31' & Creation_Date >= '2019-06-01'  ) & (first_trip_date <=  '2019-08-31' & first_trip_date >= '2019-06-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-06-01'  ) & (first_trip_date <=   '2019-08-31' & first_trip_date >= '2019-06-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-08-31' & first_trip_date > '2019-08-31'),"",'BASE'))),segment_value_n_seg_25=ifelse( n_seg_25 <= 0 ,"Inactive",ifelse( n_seg_25> min_0 & n_seg_25<  Min_1,"very_low",ifelse(n_seg_25>= Min_1 & n_seg_25 <  Min_2,"low",ifelse(n_seg_25>= Min_2 & n_seg_25<  Min_3, "mid",ifelse(n_seg_25>= Min_3 & n_seg_25 <Min_4, "high","very_high"))))), final_segment_25 = ifelse(flag_login_25=="","", paste(flag_login_25,segment_value_n_seg_25,sep = '_')))
+#### 26
+
+df_month_5_26 <- df_month_5_25 %>%   mutate(flag_login_26= ifelse((Creation_Date <= '2019-09-30' & Creation_Date >= '2019-07-01'  ) & (first_trip_date <=  '2019-09-30' & first_trip_date >= '2019-07-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-07-01'  ) & (first_trip_date <=   '2019-09-30' & first_trip_date >= '2019-07-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-09-30' & first_trip_date > '2019-09-30'),"",'BASE'))),segment_value_n_seg_26=ifelse( n_seg_26 <= 0 ,"Inactive",ifelse( n_seg_26> min_0 & n_seg_26<  Min_1,"very_low",ifelse(n_seg_26>= Min_1 & n_seg_26 <  Min_2,"low",ifelse(n_seg_26>= Min_2 & n_seg_26<  Min_3, "mid",ifelse(n_seg_26>= Min_3 & n_seg_26 <Min_4, "high","very_high"))))), final_segment_26 = ifelse(flag_login_26=="","", paste(flag_login_26,segment_value_n_seg_26,sep = '_')))
+#### 27
+
+df_month_5_27 <- df_month_5_26 %>%  mutate(flag_login_27= ifelse((Creation_Date <= '2019-10-31'& Creation_Date >= '2019-08-01'  ) & (first_trip_date <=  '2019-10-31'& first_trip_date >= '2019-08-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-08-01' ) & (first_trip_date <=   '2019-10-31' & first_trip_date >= '2019-08-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-10-31' & first_trip_date > '2019-10-31'),"",'BASE'))),segment_value_n_seg_27=ifelse( n_seg_27 <= 0 ,"Inactive",ifelse( n_seg_27> min_0 & n_seg_27<  Min_1,"very_low",ifelse(n_seg_27>= Min_1 & n_seg_27 <  Min_2,"low",ifelse(n_seg_27>= Min_2 & n_seg_27<  Min_3, "mid",ifelse(n_seg_27>= Min_3 & n_seg_27 <Min_4, "high","very_high"))))), final_segment_27 = ifelse(flag_login_27=="","", paste(flag_login_27,segment_value_n_seg_27,sep = '_')))
+#### 28
+
+df_month_5_28 <- df_month_5_27 %>%  mutate(flag_login_28= ifelse((Creation_Date <= '2019-11-30'& Creation_Date >= '2019-09-01'  ) & (first_trip_date <=  '2019-11-30'& first_trip_date >= '2019-09-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-09-01' ) & (first_trip_date <=   '2019-11-30' & first_trip_date >='2019-09-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-11-30' & first_trip_date > '2019-11-30'),"",'BASE'))),segment_value_n_seg_28=ifelse( n_seg_28 <= 0 ,"Inactive",ifelse( n_seg_28> min_0 & n_seg_28<  Min_1,"very_low",ifelse(n_seg_28>= Min_1 & n_seg_28 <  Min_2,"low",ifelse(n_seg_28>= Min_2 & n_seg_28<  Min_3, "mid",ifelse(n_seg_28>= Min_3 & n_seg_28 <Min_4, "high","very_high"))))), final_segment_28 = ifelse(flag_login_28=="","", paste(flag_login_28,segment_value_n_seg_28,sep = '_')))
+#### 29
+
+df_month_5_29 <- df_month_5_28 %>%   mutate(flag_login_29= ifelse((Creation_Date <= '2019-12-31'& Creation_Date >= '2019-10-01'   ) & (first_trip_date <=  '2019-12-31'& first_trip_date >= '2019-10-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-10-01' ) & (first_trip_date <=   '2019-12-31'& first_trip_date >='2019-10-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2019-12-31' & first_trip_date > '2019-12-31'),"",'BASE'))),segment_value_n_seg_29=ifelse( n_seg_29 <= 0 ,"Inactive",ifelse( n_seg_29> min_0 & n_seg_29<  Min_1,"very_low",ifelse(n_seg_29>= Min_1 & n_seg_29 <  Min_2,"low",ifelse(n_seg_29>= Min_2 & n_seg_29<  Min_3, "mid",ifelse(n_seg_29>= Min_3 & n_seg_29 <Min_4, "high","very_high"))))), final_segment_29 = ifelse(flag_login_29=="","", paste(flag_login_29,segment_value_n_seg_29,sep = '_')))
+#### 30
+
+df_month_5_30 <- df_month_5_29 %>% mutate(flag_login_30= ifelse((Creation_Date <= '2020-01-31'& Creation_Date >='2019-11-01'    ) & (first_trip_date <= '2020-01-31'& first_trip_date >= '2019-11-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-11-01'  ) & (first_trip_date <=   '2020-01-31'& first_trip_date >='2019-11-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-01-31' & first_trip_date > '2020-01-31'),"",'BASE'))),segment_value_n_seg_30=ifelse( n_seg_30 <= 0 ,"Inactive",ifelse( n_seg_30> min_0 & n_seg_30<  Min_1,"very_low",ifelse(n_seg_30>= Min_1 & n_seg_30 <  Min_2,"low",ifelse(n_seg_30>= Min_2 & n_seg_30<  Min_3, "mid",ifelse(n_seg_30>= Min_3 & n_seg_30 <Min_4, "high","very_high"))))), final_segment_30 = ifelse(flag_login_30=="","", paste(flag_login_30,segment_value_n_seg_30,sep = '_')))
+#### 31
+
+df_month_5_31 <- df_month_5_30 %>%   mutate(flag_login_31= ifelse((Creation_Date <= '2020-02-29' & Creation_Date >= '2019-12-01') & (first_trip_date <= '2020-02-29' & first_trip_date >= '2019-12-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-12-01') & (first_trip_date <= '2020-02-29' & first_trip_date >= '2019-12-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-02-28' & first_trip_date > '2020-02-28'),"",'BASE'))),segment_value_n_seg_31=ifelse( n_seg_31 <= 0 ,"Inactive",ifelse( n_seg_31> min_0 & n_seg_31<  Min_1,"very_low",ifelse(n_seg_31>= Min_1 & n_seg_31 <  Min_2,"low",ifelse(n_seg_31>= Min_2 & n_seg_31<  Min_3, "mid",ifelse(n_seg_31>= Min_3 & n_seg_28 <Min_4, "high","very_high"))))), final_segment_31 = ifelse(flag_login_31=="","", paste(flag_login_31,segment_value_n_seg_31,sep = '_')))
+
+
+#### 32
+
+df_month_5_32 <- df_month_5_31 %>%   mutate(flag_login_32= ifelse((Creation_Date <= '2020-02-29' & Creation_Date >= '2019-12-01') & (first_trip_date <= '2020-02-29' & first_trip_date >= '2019-12-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2019-12-01') & (first_trip_date <= '2020-02-29' & first_trip_date >= '2019-12-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-03-31' & first_trip_date > '2020-03-31'),"",'BASE'))),segment_value_n_seg_32=ifelse( n_seg_32 <= 0 ,"Inactive",ifelse( n_seg_32> min_0 & n_seg_32<  Min_1,"very_low",ifelse(n_seg_32>= Min_1 & n_seg_32 <  Min_2,"low",ifelse(n_seg_32>= Min_2 & n_seg_32<  Min_3, "mid",ifelse(n_seg_32>= Min_3 & n_seg_32 <Min_4, "high","very_high"))))), final_segment_32 = ifelse(flag_login_32=="","", paste(flag_login_32,segment_value_n_seg_32,sep = '_')))
+#### 33
+
+df_month_5_33 <- df_month_5_32 %>%   mutate(flag_login_33= ifelse((Creation_Date <= '2020-04-30' & Creation_Date >= '2020-02-01') & (first_trip_date <= '2020-04-30' & first_trip_date >= '2020-02-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-02-01') & (first_trip_date <= '2020-04-30' & first_trip_date >= '2020-02-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-04-30' & first_trip_date > '2020-04-30'),"",'BASE'))),segment_value_n_seg_33=ifelse( n_seg_33 <= 0 ,"Inactive",ifelse( n_seg_33> min_0 & n_seg_33<  Min_1,"very_low",ifelse(n_seg_33>= Min_1 & n_seg_33 <  Min_2,"low",ifelse(n_seg_33>= Min_2 & n_seg_33<  Min_3, "mid",ifelse(n_seg_33>= Min_3 & n_seg_33 <Min_4, "high","very_high"))))), final_segment_33 = ifelse(flag_login_33=="","", paste(flag_login_33,segment_value_n_seg_33,sep = '_')))
+#### 34
+
+df_month_5_34 <- df_month_5_33 %>%   mutate(flag_login_34= ifelse((Creation_Date <= '2020-05-31' & Creation_Date >= '2020-03-01' ) & (first_trip_date <= '2020-05-31' & first_trip_date >= '2020-03-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-03-01' ) & (first_trip_date <= '2020-05-31' & first_trip_date >= '2020-03-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-05-31' & first_trip_date > '2020-05-31'),"",'BASE'))),segment_value_n_seg_34=ifelse( n_seg_34 <= 0 ,"Inactive",ifelse( n_seg_34> min_0 & n_seg_34<  Min_1,"very_low",ifelse(n_seg_34>= Min_1 & n_seg_34 <  Min_2,"low",ifelse(n_seg_34>= Min_2 & n_seg_34<  Min_3, "mid",ifelse(n_seg_34>= Min_3 & n_seg_34 <Min_4, "high","very_high"))))), final_segment_34 = ifelse(flag_login_34=="","", paste(flag_login_34,segment_value_n_seg_34,sep = '_')))
+#### 35
+
+df_month_5_35 <- df_month_5_34 %>%  mutate(flag_login_35= ifelse((Creation_Date <= '2020-06-30' & Creation_Date >= '2020-04-01' ) & (first_trip_date <= '2020-06-30' & first_trip_date >= '2020-04-01'  ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-04-01' ) & (first_trip_date <= '2020-06-30' & first_trip_date >= '2020-04-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-06-30' & first_trip_date > '2020-06-30'),"",'BASE'))),segment_value_n_seg_35=ifelse( n_seg_28 <= 0 ,"Inactive",ifelse( n_seg_35> min_0 & n_seg_35<  Min_1,"very_low",ifelse(n_seg_35>= Min_1 & n_seg_35 <  Min_2,"low",ifelse(n_seg_35>= Min_2 & n_seg_35<  Min_3, "mid",ifelse(n_seg_35>= Min_3 & n_seg_35 <Min_4, "high","very_high"))))), final_segment_35 = ifelse(flag_login_35=="","", paste(flag_login_35,segment_value_n_seg_35,sep = '_')))
+#### 36
+
+df_month_5_36 <- df_month_5_35 %>%   mutate(flag_login_36= ifelse((Creation_Date <= '2020-07-31' & Creation_Date >= '2020-05-01' ) & (first_trip_date <= '2020-07-31' & first_trip_date >= '2020-05-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-05-01' ) & (first_trip_date <= '2020-07-31' & first_trip_date >= '2020-05-01'  ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-07-31' & first_trip_date > '2020-07-31'),"",'BASE'))),segment_value_n_seg_36=ifelse( n_seg_36 <= 0 ,"Inactive",ifelse( n_seg_36> min_0 & n_seg_36<  Min_1,"very_low",ifelse(n_seg_36>= Min_1 & n_seg_36 <  Min_2,"low",ifelse(n_seg_36>= Min_2 & n_seg_36<  Min_3, "mid",ifelse(n_seg_36>= Min_3 & n_seg_36 <Min_4, "high","very_high"))))), final_segment_36 = ifelse(flag_login_36=="","", paste(flag_login_36,segment_value_n_seg_36,sep = '_')))
+#### 37
+
+df_month_5_37 <- df_month_5_36 %>%   mutate(flag_login_37= ifelse((Creation_Date <= '2020-08-31' & Creation_Date >= '2020-06-01' ) & (first_trip_date <= '2020-08-31' & first_trip_date >= '2020-06-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-06-01' ) & (first_trip_date <= '2020-08-31' & first_trip_date >= '2020-06-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-08-31' & first_trip_date > '2020-08-31'),"",'BASE'))),segment_value_n_seg_37=ifelse( n_seg_37 <= 0 ,"Inactive",ifelse( n_seg_37> min_0 & n_seg_37<  Min_1,"very_low",ifelse(n_seg_37>= Min_1 & n_seg_37 <  Min_2,"low",ifelse(n_seg_37>= Min_2 & n_seg_37<  Min_3, "mid",ifelse(n_seg_37>= Min_3 & n_seg_37 <Min_4, "high","very_high"))))), final_segment_37 = ifelse(flag_login_37=="","", paste(flag_login_37,segment_value_n_seg_37,sep = '_')))
+#### 38
+
+df_month_5_38 <- df_month_5_37 %>%   mutate(flag_login_38= ifelse((Creation_Date <= '2020-09-30' & Creation_Date >= '2020-07-01' ) & (first_trip_date <= '2020-09-30' & first_trip_date >= '2020-07-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-07-01') & (first_trip_date <= '2020-09-30' & first_trip_date >= '2020-07-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-09-30' & first_trip_date > '2020-09-30'),"",'BASE'))),segment_value_n_seg_38=ifelse( n_seg_38 <= 0 ,"Inactive",ifelse( n_seg_38> min_0 & n_seg_38<  Min_1,"very_low",ifelse(n_seg_38>= Min_1 & n_seg_38 <  Min_2,"low",ifelse(n_seg_38>= Min_2 & n_seg_38<  Min_3, "mid",ifelse(n_seg_38>= Min_3 & n_seg_38 <Min_4, "high","very_high"))))),final_segment_38 = ifelse(flag_login_38=="","", paste(flag_login_38,segment_value_n_seg_38,sep = '_')))
+#### 39
+
+df_month_5_39 <- df_month_5_38 %>% mutate(flag_login_39= ifelse((Creation_Date <= '2020-10-31' & Creation_Date >= '2020-08-01' ) & (first_trip_date <= '2020-10-31' & first_trip_date >= '2020-08-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-08-01') & (first_trip_date <= '2020-10-31' & first_trip_date >= '2020-08-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-10-31' & first_trip_date > '2020-10-31'),"",'BASE'))),segment_value_n_seg_39=ifelse( n_seg_39 <= 0 ,"Inactive",ifelse( n_seg_39> min_0 & n_seg_39<  Min_1,"very_low",ifelse(n_seg_39>= Min_1 & n_seg_39 <  Min_2,"low",ifelse(n_seg_39>= Min_2 & n_seg_39<  Min_3, "mid",ifelse(n_seg_39>= Min_3 & n_seg_39 <Min_4, "high","very_high"))))), final_segment_39 = ifelse(flag_login_39=="","", paste(flag_login_39,segment_value_n_seg_39,sep = '_')))
+#### 40
+
+df_month_5_40 <- df_month_5_39 %>%   mutate(flag_login_40= ifelse((Creation_Date <= '2020-11-30' & Creation_Date >= '2020-09-01' ) & (first_trip_date <= '2020-11-30' & first_trip_date >= '2020-09-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <= '2020-09-01') & (first_trip_date <= '2020-11-30' & first_trip_date >= '2020-09-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-11-30' & first_trip_date > '2020-11-30'),"",'BASE'))),segment_value_n_seg_40=ifelse( n_seg_40 <= 0 ,"Inactive",ifelse( n_seg_40> min_0 & n_seg_40<  Min_1,"very_low",ifelse(n_seg_40>= Min_1 & n_seg_40 <  Min_2,"low",ifelse(n_seg_40>= Min_2 & n_seg_40<  Min_3, "mid",ifelse(n_seg_40>= Min_3 & n_seg_40 <Min_4, "high","very_high"))))), final_segment_40 = ifelse(flag_login_40=="","", paste(flag_login_40,segment_value_n_seg_40,sep = '_')))
+#### 41
+
+
+df_month_5_41 <- df_month_5_40 %>%   mutate(flag_login_41= ifelse((Creation_Date <= '2020-12-31' & Creation_Date >= '2020-10-01' ) & (first_trip_date <='2020-12-31' & first_trip_date >= '2020-10-01' ) ,'New_User_New_Login',ifelse( (Creation_Date <='2020-10-01') & (first_trip_date <= '2020-12-31' & first_trip_date >= '2020-10-01' ),'New_User_BASE_Login',ifelse((Creation_Date > '2020-12-31' & first_trip_date > '2020-12-31'),"",'BASE'))),segment_value_n_seg_41=ifelse( n_seg_41 <= 0 ,"Inactive",ifelse( n_seg_41> min_0 & n_seg_41<  Min_1,"very_low",ifelse(n_seg_41>= Min_1 & n_seg_41 <  Min_2,"low",ifelse(n_seg_41>= Min_2 & n_seg_41<  Min_3, "mid",ifelse(n_seg_41>= Min_3 & n_seg_41 <Min_4, "high","very_high"))))), final_segment_41 = ifelse(flag_login_41=="","", paste(flag_login_41,segment_value_n_seg_41,sep = '_')))
+
+####
+today <-  today()
+
+library(openxlsx)
+
+over_all_1 <- df_month_5_41 %>% left_join(df_month_3_o,by= "rider")
+over_all_2 <- over_all_1 %>% left_join(df_month_3_tr,by= "rider")
+over_all_3 <- over_all_2 %>% left_join(df_month_3_v,by= "rider") %>% dplyr::select(-c(first_trip_date,Creation_Date))
+over_all_4 <- df %>% filter( pickup_WL_most_use == "Alger" ) %>% dplyr::distinct(rider,Creation_Date,last_trip_date,first_trip_date)  %>%  mutate(passivity=as.numeric(difftime(today,last_trip_date),units="days"))
+over_all <- over_all_4 %>% left_join(over_all_3,by= "rider")
+
+
+write.csv(over_all,"E:/Git_RStudio_Project/Profiling_rider_202011/Segmentation/over_all.csv")
+dim(over_all_check_month_use_active)
+## over_all_aggregation
+over_all_check_month_use_active <- over_all %>% group_by(segment_date,passivity,flag_login_41,segment_value_n_seg_41,final_segment_41,flag_login_30,segment_value_n_seg_30,final_segment_30,flag_login_31,segment_value_n_seg_31,final_segment_31,flag_login_32,segment_value_n_seg_32,final_segment_32,flag_login_33,segment_value_n_seg_33,final_segment_33,flag_login_34,segment_value_n_seg_34,final_segment_34) %>% summarise(nb=n(),n_seg_41_or= sum(n_seg_41_or),o_seg_41=sum(o_seg_41),n_seg_41_tr=sum(n_seg_41_tr),t_seg_41 =sum(t_seg_41),n_seg_41 =sum(n_seg_41),e_seg_41 =sum(e_seg_41),t_seg_41 =sum(t_seg_41),n_seg_41_rv =sum(n_seg_41_rv),rv_seg_41 =sum(rv_seg_41),n_seg_31_or= sum(n_seg_31_or),o_seg_31=sum(o_seg_31),n_seg_31_tr=sum(n_seg_31_tr),t_seg_31 =sum(t_seg_31),n_seg_31 =sum(n_seg_31),e_seg_31 =sum(e_seg_31),n_seg_31_rv =sum(n_seg_31_rv),rv_seg_31 =sum(rv_seg_31),n_seg_30_or= sum(n_seg_30_or),o_seg_30=sum(o_seg_30),n_seg_30_tr=sum(n_seg_30_tr),t_seg_30 =sum(t_seg_30),n_seg_30 =sum(n_seg_30),e_seg_30 =sum(e_seg_30),n_seg_30_rv =sum(n_seg_30_rv),rv_seg_30 =sum(rv_seg_30),n_seg_32_or= sum(n_seg_32_or),o_seg_32=sum(o_seg_32),n_seg_32_tr=sum(n_seg_32_tr),t_seg_32 =sum(t_seg_32),n_seg_32 =sum(n_seg_32),e_seg_32 =sum(e_seg_32),n_seg_32_rv =sum(n_seg_32_rv),rv_seg_32 =sum(rv_seg_32),n_seg_33_or= sum(n_seg_33_or),o_seg_33=sum(o_seg_33),n_seg_33_tr=sum(n_seg_33_tr),t_seg_33 =sum(t_seg_33),n_seg_33 =sum(n_seg_33),e_seg_33 =sum(e_seg_33),n_seg_33_rv =sum(n_seg_33_rv),rv_seg_33 =sum(rv_seg_33),n_seg_34_or= sum(n_seg_34_or),o_seg_34=sum(o_seg_34),n_seg_34_tr=sum(n_seg_34_tr),t_seg_34 =sum(t_seg_34),n_seg_34 =sum(n_seg_34),e_seg_34 =sum(e_seg_34),n_seg_34_rv =sum(n_seg_34_rv),rv_seg_34 =sum(rv_seg_34))
+
+
+
+write.csv(over_all_check_month_use_active,'E:/Git_RStudio_Project/Profiling_rider_202011/Segmentation/over_all_check_month_use_active.csv')
+
+```
+
+
+
+```{r}
 ### Segment Before Covid 19 normalized by age:
 
 df_cum_1 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_31_t > 0 ) %>% dplyr::select(rider,n_seg_31_t)%>% 
@@ -1491,7 +1652,6 @@ box_plot_n_seg_31_s_1 <- df_month_3 %>% filter(segment_date <= '2020-02',n_seg_3
 df_cum_1 + df_density1 +box_plot_n_seg_31_1+box_plot_n_seg_31_s_1
 
 ```
-
 
 
 ```{r}
@@ -1804,7 +1964,6 @@ over_all_check <- over_all %>% group_by(flag_login_41,segment_value_n_seg_41,fin
 dim(over_all_check)
 
 write.csv(over_all_check,'E:/Git_RStudio_Project/Profiling_rider_202011/Segmentation/over_all_check.csv')
-df_month_5_chack
-gc()
+
 ```
 

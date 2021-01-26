@@ -1,0 +1,154 @@
+---
+title: "Multi_usres"
+output: html_notebook
+---
+
+
+
+```{r}
+library(broom)
+library(sigr)
+library(purrr)
+library(ggplot2)
+library(dplyr)
+library(gapminder)
+library(tidyverse)
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(ggthemes)
+library(stringr)
+library(lattice)
+library(caret)
+library(plotly)
+library(maps)
+library(boot)
+library(kableExtra)
+library(factoextra)
+library(ROCR) 
+library(PerformanceAnalytics)
+library(e1071)
+library(caret)
+library(gbm)
+library(corrplot)
+library(ggcorrplot)
+library(MASS)
+library(rpart)
+library(caTools)
+library(naivebayes)
+library(class)
+library(ISLR)
+library(glmnet)
+library(Hmisc)
+library(funModeling)
+library(pROC)
+library(randomForest)
+library(klaR)
+library(scales)
+library(cluster)
+library(factoextra)
+library(ClustOfVar)
+library(GGally)
+library(lubridate)
+library(patchwork)
+db <- dbConnect(
+ bigrquery::bigquery(),
+ project = "yassir-data-project",
+ dataset = "YassirGo_Wahab",
+ billing = "yassir-data-project"
+ 
+)
+
+options(scipen = 20)
+Raw_data_multi <- "SELECT * FROM `yassir-data-project.YassirGo_Wahab.multi_users_estimator_algiers`"
+
+
+Raw_data_multi_users <- DBI::dbGetQuery(db, Raw_data_multi)
+
+ya_team_users <- "SELECT * FROM `yassir-data-project.YassirGo_Wahab.ya_team_users`"
+
+Raw_data_multi_users <- DBI::dbGetQuery(db, Raw_data_multi)
+
+email <- "SELECT * FROM `yassir-data-project.YassirGo_Wahab.email_users_algerie_yassir_go`"
+
+post_eval <- "SELECT * FROM `yassir-data-project.YassirGo_Wahab.multi_users_post_eval`"
+
+Raw_data_multi_users <- DBI::dbGetQuery(db, Raw_data_multi)
+ya_team_users <- DBI::dbGetQuery(db, ya_team_users)
+email_users <- DBI::dbGetQuery(db, email)
+post_eval <- DBI::dbGetQuery(db, post_eval)
+saveRDS(ya_team_users, "ya_team_users.rds")
+saveRDS(Raw_data_multi_users, "Raw_data_multi_users.rds")
+df <- readRDS("Raw_data_multi_users.rds")
+df_yatem_users <- readRDS("ya_team_users.rds")
+```
+
+```{r}
+df_yatem_users1 <- df_yatem_users %>% mutate(users = "Yat")
+df_yatem_users1
+# Target preparation
+glimpse(df_yatem_users1)
+head(df)
+tail(df)
+## 
+df_1 <- df %>% filter(is.na(flag_driver) &  is.na(flag_finished_trips)) %>% mutate(target = "Target1")
+
+df_2 <- df %>% filter(is.na(flag_driver) &  flag_finished_trips == 1 & passivity_finished_date >= 30) %>% mutate(target = "Target2")
+df_2
+
+df_All_Target <- df %>% mutate(Traget = ifelse((is.na(flag_driver) &  is.na(flag_finished_trips)),"Traget1",ifelse((is.na(flag_driver) &  flag_finished_trips == 1 & passivity_finished_date >= 30),"Traget2","No"))) %>% left_join(df_yatem_users1,by="rider") %>% left_join(email_users, by = "rider") %>% dplyr::select(rider,phone,Traget,users,email) 
+
+df_All_Target1 <- df_All_Target %>%  dplyr::select(rider,Traget,email) 
+df_All_Target1
+N <- nrow(df_All_Target)
+# Hint: use round() to get an integer
+(target <- round(N * 0.9))
+
+# Create the vector of N uniform random variables: gp
+gp <- runif(N)
+gp
+df_All_Target_startified <- df_All_Target %>% filter(Traget %in% c("Traget1","Traget2")) %>% cbind(gp) %>% mutate(Flag_CG= ifelse(gp<= 0.90 ,"TARGET","GCU")) %>% dplyr::select(rider,Flag_CG)
+df_All_Target_startified
+
+# Calculate how many rows 75% of N should be and print it
+
+
+df_final <- df %>% left_join(df_All_Target1,by="rider") %>% left_join(df_All_Target_startified,by="rider")
+###
+
+### Rider id
+df_final_rider <-df_final %>% filter(Traget != "No",Flag_CG != "GCU") %>% dplyr::distinct (rider)
+write.csv(df_final_rider,'E:/Git_RStudio_Project/Profiling_rider_202011/Segmentation/Multi_users_target_24_01_2021/df_final_rider.csv')
+target_campaign <- read.csv('E:/Git_RStudio_Project/Profiling_rider_202011/Segmentation/Multi_users_target_24_01_2021/df_final_rider.csv')
+target_campaign_1 <- target_campaign %>% mutate (cam= "Target")
+target_campaign_1
+## Phone number
+df_final_phone <-df_final %>% filter(Traget != "No",Flag_CG != "GCU") %>% dplyr::distinct (phone)
+df_final_phone
+write.csv(df_final_phone,'E:/Git_RStudio_Project/Profiling_rider_202011/Segmentation/Multi_users_target_24_01_2021/df_final_phone.csv')
+
+## Email
+df_final_email <-df_final %>% filter(Traget != "No",Flag_CG != "GCU") %>% dplyr::distinct (email)
+write.csv(df_final_email,'E:/Git_RStudio_Project/Profiling_rider_202011/Segmentation/Multi_users_target_24_01_2021/df_final_email.csv')
+
+
+
+```
+```{r}
+df_All_Target1 <- df_All_Target %>%  dplyr::select(rider,Traget,email) %>% left_join(target_campaign_1, by= "rider") %>% mutate(campaign_target = ifelse((Traget != "No" & is.na(cam)),"GCU",cam))  %>% dplyr::select(rider,email,campaign_target,Traget)
+df_All_Target1
+
+Overall_data <- df %>% left_join(df_All_Target1, by ="rider")
+
+saveRDS(Overall_data, "Overall_data.rds")
+Overall_data <- readRDS("Overall_data.rds")
+```
+
+```{r}
+Post_eval_final <- Overall_data %>% left_join(post_eval,by="rider")  %>% filter(Traget!="No")%>% mutate(Traget_split = ifelse(campaign_target == "GCU","GCU",Traget)) %>%  group_by(Traget_split,flag_finished_trips_post) %>% summarise(nb=n()) %>% arrange(Traget_split) %>% mutate(Finish_Flag = as.factor(flag_finished_trips_post)) %>% ggplot(aes(Traget_split,nb,fill=Finish_Flag)) +
+        geom_col()
+Post_eval_final
+```
+
+
